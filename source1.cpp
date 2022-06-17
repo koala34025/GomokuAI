@@ -66,6 +66,7 @@ bool is_spot_valid(Point center) {
 std::list<Point> GeneratePlaces() {
     std::list<Point> places;
 
+    bool added[SIZE][SIZE] = { 0 };
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             if (is_spot_valid(Point(i, j)))
@@ -76,9 +77,10 @@ std::list<Point> GeneratePlaces() {
                     int newI = i + d8x[dir] * mul;
                     int newJ = j + d8y[dir] * mul;
                     Point newPoint(newI, newJ);
-                    if(!is_spot_on_board(newPoint) || !is_spot_valid(newPoint))
+                    if(!is_spot_on_board(newPoint) || !is_spot_valid(newPoint) || added[newI][newJ])
                         continue;
                     
+                    added[newI][newJ] = true;
                     places.push_back(newPoint);
                 }
             }
