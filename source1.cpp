@@ -62,28 +62,30 @@ bool is_spot_valid(Point center) {
     return true;
 }
 
-// Generate a placement if it is in star(dist of 4) of a dot
+// Generate a placement if it is in square(5x5) of a dot
 std::list<Point> GeneratePlaces() {
+    const int NeighborDist = 2;
     std::list<Point> places;
-
-    bool added[SIZE][SIZE] = { 0 };
+    
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            if (is_spot_valid(Point(i, j)))
+            if (!is_spot_valid(Point(i, j)))
                 continue;
             
-            for (int dir = 0; dir < 8; dir++) {
-                for (int mul = 1; mul <= 4; mul++) {
-                    int newI = i + d8x[dir] * mul;
-                    int newJ = j + d8y[dir] * mul;
+            bool ok = false;
+            for (int newI = i-NeighborDist; newI <= i+NeighborDist; newI++) {
+                for (int newJ = j-NeighborDist; newJ <= j+NeighborDist; newJ++) {
                     Point newPoint(newI, newJ);
-                    if(!is_spot_on_board(newPoint) || !is_spot_valid(newPoint) || added[newI][newJ])
-                        continue;
-                    
-                    added[newI][newJ] = true;
-                    places.push_back(newPoint);
+                    if (is_spot_on_board(newPoint) && !is_spot_valid(newPoint)) {
+                        ok = true;
+                        break;
+                    }
                 }
+                if (ok)
+                    break;
             }
+            if (ok)
+                places.push_back(Point(i, j));
         }
     }
     
@@ -93,6 +95,10 @@ std::list<Point> GeneratePlaces() {
 
     return places;
 }
+
+//---------------------------------------------------------------------------------------------------------------//
+
+
 
 //---------------------------------------------------------------------------------------------------------------//
 
