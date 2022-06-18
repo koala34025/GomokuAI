@@ -281,6 +281,9 @@ int DeathFourCount(int who) {
                     }
                 }
             }
+            else {
+                ok = false;
+            }
             if (ok) {
                 cnt++;
             }
@@ -299,6 +302,9 @@ int DeathFourCount(int who) {
                         break;
                     }
                 }
+            }
+            else {
+                ok = false;
             }
             if (ok) {
                 cnt++;
@@ -319,6 +325,9 @@ int DeathFourCount(int who) {
                     }
                 }
             }
+            else {
+                ok = false;
+            }
             if (ok) {
                 cnt++;
             }
@@ -337,6 +346,9 @@ int DeathFourCount(int who) {
                         break;
                     }
                 }
+            }
+            else {
+                ok = false;
             }
             if (ok) {
                 cnt++;
@@ -617,7 +629,11 @@ int DeathThreeCount(int who) {
                     }
                 }
             }
+            else {
+                ok = false;
+            }
             if (ok) {
+                //std::cout << "l: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -636,7 +652,11 @@ int DeathThreeCount(int who) {
                     }
                 }
             }
+            else {
+                ok = false;
+            }
             if (ok) {
+                //std::cout << "k: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -655,7 +675,11 @@ int DeathThreeCount(int who) {
                     }
                 }
             }
+            else {
+                ok = false;
+            }
             if (ok) {
+                //std::cout << "j: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -674,7 +698,11 @@ int DeathThreeCount(int who) {
                     }
                 }
             }
+            else {
+                ok = false;
+            }
             if (ok) {
+                //std::cout << "i: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -699,6 +727,7 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //std::cout << "h: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -722,6 +751,7 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //std::cout << "g: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -745,6 +775,7 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //std::cout << "f: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -768,6 +799,7 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //std::cout << "e: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -792,6 +824,7 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //std::cout << "d: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -815,6 +848,7 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //std::cout << "c: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -838,6 +872,7 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //std::cout << "b: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -861,6 +896,7 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //std::cout << "a: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -1091,14 +1127,43 @@ int OneCount(int who) {
 }
 
 int OverallScore(int who) {
-    int score = 0;
-    score += OneCount(who) * oneValue;
-    score += TwoCount(who) * twoValue;
-    score += DeathThreeCount(who) * deathThreeValue;
-    score += ThreeCount(who) * threeValue;
-    score += DeathFourCount(who) * deathFourValue;
-    score += FourCount(who) * fourValue;
-    score += FiveCount(who) * fiveValue;
+    int score = 0, tmpCnt;
+
+    tmpCnt = OneCount(who);
+    score += tmpCnt * oneValue;
+    //if (tmpCnt > 0)
+        //std::cout << "OneCount: " << tmpCnt << '\n';
+
+    tmpCnt = TwoCount(who);
+    score += tmpCnt * twoValue;
+    //if (tmpCnt > 0)
+        //std::cout << "TwoCount: " << tmpCnt << '\n';
+
+    tmpCnt = DeathThreeCount(who);
+    score += tmpCnt * deathThreeValue;
+    //if (tmpCnt > 0)
+        //std::cout << "DeathThreeCount: " << tmpCnt << '\n';
+
+    tmpCnt = ThreeCount(who);
+    score += tmpCnt * threeValue;
+    //if (tmpCnt > 0)
+        //std::cout << "ThreeCount: " << tmpCnt << '\n';
+
+    tmpCnt = DeathFourCount(who);
+    score += tmpCnt * deathFourValue;
+    //if (tmpCnt > 0)
+        //std::cout << "DeathFourCount: " << tmpCnt << '\n';
+
+    tmpCnt = FourCount(who);
+    score += tmpCnt * fourValue;
+    //if (tmpCnt > 0)
+        //std::cout << "FourCount: " << tmpCnt << '\n';
+
+    tmpCnt = FiveCount(who);
+    score += tmpCnt * fiveValue;
+    //if(tmpCnt > 0)
+        //std::cout << "FiveCount: " << tmpCnt << '\n';
+
     return score;
 }
 
@@ -1125,10 +1190,10 @@ void read_board(std::ifstream& fin) {
 void write_valid_spot(std::ofstream& fout) {
     srand(time(NULL));
     // Keep updating the output until getting killed.
-
     Point PlacePoint;
     int maxEval = -1e9;
     for (Point p : GeneratePlaces()) {
+        //std::cout << "Trying: (" << p.x << " " << p.y << ")\n";
         set_disc(p, player);
         int eval = Evaluate();
         if (eval > maxEval) {
