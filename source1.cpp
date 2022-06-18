@@ -13,7 +13,7 @@ enum SPOT_STATE {
     WHITE = 2
 };
 
-const int oneValue = 10; // Consider a dot if it in the star of another one
+const int oneValue = 2; // Consider a dot if it in the star of another one
 const int twoValue = 100;
 const int deathThreeValue = 100;
 const int threeValue = 1000;
@@ -1221,6 +1221,11 @@ int Evaluate() {
     int opponentScore = OverallScore(get_next_player(player));
 
     int evaluation = myScore - opponentScore;
+
+    // Fix starting
+    if (opponentScore > 0) {
+        evaluation++;
+    }
 
     return evaluation;
 }
