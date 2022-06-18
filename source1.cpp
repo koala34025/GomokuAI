@@ -5,7 +5,9 @@
 #include <array>
 #include <list>
 #include <map>
-#define DEBUG 1
+#include <utility>
+#define DEBUG 0
+#define MXDEPTH 1
 
 enum SPOT_STATE {
     EMPTY = 0,
@@ -26,6 +28,7 @@ const int SIZE = 15;
 std::array<std::array<int, SIZE>, SIZE> board;
 int d8x[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
 int d8y[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+const int INF = 1e9;
 
 struct Point {
     int x, y;
@@ -119,10 +122,6 @@ std::list<Point> GeneratePlaces() {
                 places.push_back(Point(i, j));
         }
     }
-    
-    // If the list is empty, go (7, 7) 
-    if (places.empty())
-        places.push_back(Point(7, 7));
 
     return places;
 }
@@ -1204,9 +1203,9 @@ int OverallScore(int who) {
     return score;
 }
 
-int Evaluate() {
-    int myScore = OverallScore(player);
-    int opponentScore = OverallScore(get_next_player(player));
+int Evaluate(int who) {
+    int myScore = OverallScore(who);
+    int opponentScore = OverallScore(get_next_player(who));
 
     int evaluation = myScore - opponentScore;
 
@@ -1216,6 +1215,36 @@ int Evaluate() {
     }
 
     return evaluation;
+}
+
+//---------------------------------------------------------------------------------------------------------------//
+
+std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
+    if (depth == 0) {
+        return { Evaluate(who), Point(-1, -1) };
+    }
+
+    std::list<Point> places = GeneratePlaces();
+
+    if (places.empty()) {
+        return { 0, Point(7, 7) };
+    }
+
+    Point PlacePoint;
+    for (Point p : places) {
+        set_disc(p, who);
+        int evaluation = -AlphaBeta(depth - 1, -beta, -alpha, get_next_player(who)).first;
+        set_disc(p, EMPTY);
+        if (evaluation >= beta) {
+            return { beta, p };
+        }
+        if (evaluation > alpha) {
+            alpha = evaluation;
+            PlacePoint = p;
+        }
+    }
+
+    return { alpha, PlacePoint };
 }
 
 //---------------------------------------------------------------------------------------------------------------//
@@ -1232,20 +1261,31 @@ void read_board(std::ifstream& fin) {
 void write_valid_spot(std::ofstream& fout) {
     srand(time(NULL));
     // Keep updating the output until getting killed.
-    Point PlacePoint;
-    int maxEval = -1e9;
-    for (Point p : GeneratePlaces()) {
-        if (DEBUG)
-            std::cout << "Trying " << ((player == 1) ? "O" : "X") << " on (" << p.x << " " << p.y << ")\n";
 
-        set_disc(p, player);
-        int eval = Evaluate();
-        if (eval > maxEval) {
-            maxEval = eval;
-            PlacePoint = p;
-        }
-        set_disc(p, EMPTY);
+    Point PlacePoint;
+    
+    PlacePoint = AlphaBeta(MXDEPTH, -INF, INF, player).second;
+
+    /*std::list<Point> places = GeneratePlaces();
+    if (places.empty()) {
+        PlacePoint.x = PlacePoint.y = 7;
     }
+    else {
+        int maxEval = -INF;
+        for (Point p : places) {
+            if (DEBUG)
+                std::cout << "Trying " << ((player == 1) ? "O" : "X") << " on (" << p.x << " " << p.y << ")\n";
+
+            set_disc(p, player);
+            int eval = Evaluate(player);
+            if (eval > maxEval) {
+                maxEval = eval;
+                PlacePoint = p;
+            }
+            set_disc(p, EMPTY);
+        }
+    }*/
+
     fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
     // Remember to flush the output to ensure the last action is written to file.
     fout.flush();
