@@ -295,6 +295,8 @@ int DeathFourCount(int who) {
                 ok = false;
             }
             if (ok) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -317,6 +319,8 @@ int DeathFourCount(int who) {
                 ok = false;
             }
             if (ok) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -339,6 +343,8 @@ int DeathFourCount(int who) {
                 ok = false;
             }
             if (ok) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -361,6 +367,8 @@ int DeathFourCount(int who) {
                 ok = false;
             }
             if (ok) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -385,6 +393,8 @@ int DeathFourCount(int who) {
                 }
             }
             if (myDotCnt == 4) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -408,6 +418,8 @@ int DeathFourCount(int who) {
                 }
             }
             if (myDotCnt == 4) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -431,6 +443,8 @@ int DeathFourCount(int who) {
                 }
             }
             if (myDotCnt == 4) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -440,9 +454,9 @@ int DeathFourCount(int who) {
     for (int i = 6; i < SIZE; i++) {
         for (int j = 0; j < SIZE - 7; j++) {
             int myDotCnt = 0;
-            if ((board[i][j] == EMPTY && board[i][j + 6] == EMPTY) ||
-                (board[i][j] == EMPTY && board[i][j + 6] == opponent) ||
-                (board[i][j] == opponent && board[i][j + 6] == EMPTY)) {
+            if ((board[i][j] == EMPTY && board[i - 6][j + 6] == EMPTY) ||
+                (board[i][j] == EMPTY && board[i - 6][j + 6] == opponent) ||
+                (board[i][j] == opponent && board[i - 6][j + 6] == EMPTY)) {
                 for (int k = 0; k < 5; k++) {
                     if (board[i - 1 - k][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -454,6 +468,8 @@ int DeathFourCount(int who) {
                 }
             }
             if (myDotCnt == 4) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -477,6 +493,8 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -493,6 +511,8 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -509,6 +529,8 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -525,6 +547,8 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -549,6 +573,8 @@ int ThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -570,6 +596,8 @@ int ThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -591,6 +619,8 @@ int ThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -612,6 +642,8 @@ int ThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
+                //if (DEBUG)
+                    //std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -795,9 +827,9 @@ int DeathThreeCount(int who) {
     for (int i = 5; i < SIZE; i++) {
         for (int j = 0; j < SIZE - 6; j++) {
             int myDotCnt = 0;
-            if ((board[i][j] == EMPTY && board[i][j + 5] == EMPTY) ||
-                (board[i][j] == EMPTY && board[i][j + 5] == opponent) ||
-                (board[i][j] == opponent && board[i][j + 5] == EMPTY)) {
+            if ((board[i][j] == EMPTY && board[i - 5][j + 5] == EMPTY) ||
+                (board[i][j] == EMPTY && board[i - 5][j + 5] == opponent) ||
+                (board[i][j] == opponent && board[i - 5][j + 5] == EMPTY)) {
                 for (int k = 0; k < 4; k++) {
                     if (board[i - 1 - k][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -892,9 +924,9 @@ int DeathThreeCount(int who) {
     for (int i = 6; i < SIZE; i++) {
         for (int j = 0; j < SIZE - 7; j++) {
             int myDotCnt = 0;
-            if ((board[i][j] == EMPTY && board[i][j + 6] == EMPTY) ||
-                (board[i][j] == EMPTY && board[i][j + 6] == opponent) ||
-                (board[i][j] == opponent && board[i][j + 6] == EMPTY)) {
+            if ((board[i][j] == EMPTY && board[i - 6][j + 6] == EMPTY) ||
+                (board[i][j] == EMPTY && board[i - 6][j + 6] == opponent) ||
+                (board[i][j] == opponent && board[i - 6][j + 6] == EMPTY)) {
                 for (int k = 0; k < 5; k++) {
                     if (board[i - 1 - k][j + 1 + k] == opponent) {
                         myDotCnt = 0;
