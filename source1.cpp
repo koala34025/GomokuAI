@@ -5,7 +5,7 @@
 #include <array>
 #include <list>
 #include <map>
-#define DEBUG 1
+#define DEBUG 0
 
 enum SPOT_STATE {
     EMPTY = 0,
@@ -75,9 +75,8 @@ bool is_spot_valid(Point center) {
     return true;
 }
 
-int HasNeighborInValidSpot(Point p, int neighborDist, int checkAlly) { 
+bool HasNeighborInValidSpot(Point p, int neighborDist, int checkAlly) { 
     // checkAlly: 1 for true, 0 for false, -1 for checkEnemy
-    int cnt = 0;
     for (int newI = p.x - neighborDist; newI <= p.x + neighborDist; newI++) {
         if (newI < 0 || newI >= SIZE)
             continue;
@@ -91,20 +90,20 @@ int HasNeighborInValidSpot(Point p, int neighborDist, int checkAlly) {
             Point newP(newI, newJ);
             if (checkAlly == 0) {
                 if (!is_spot_valid(newP)) {
-                    cnt++;
+                    return true;
                 }
             }
             else if(checkAlly == 1){
                 if (get_disc(newP) == get_disc(p))
-                    cnt++;
+                    return true;
             }
             else if (checkAlly == -1) {
                 if (get_disc(newP) == (3 - get_disc(p)))
-                    cnt++;
+                    return true;
             }
         }
     }
-    return cnt;
+    return false;
 }
 
 // Generate a placement if it is in square(5x5) of a dot
