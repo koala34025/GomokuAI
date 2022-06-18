@@ -12,6 +12,16 @@ enum SPOT_STATE {
     WHITE = 2
 };
 
+const int oneValue = 10;
+const int twoValue = 100;
+const int threeValue = 1000;
+const int fourValue = 100000;
+const int fiveValue = 10000000;
+const int blockedOneValue = 1;
+const int blockedTwoValue = 10;
+const int blockedThreeValue = 100;
+const int blockedFourValue = 10000;
+
 int player;
 const int SIZE = 15;
 std::array<std::array<int, SIZE>, SIZE> board;
@@ -72,19 +82,24 @@ std::list<Point> GeneratePlaces() {
             if (!is_spot_valid(Point(i, j)))
                 continue;
             
-            bool ok = false;
+            bool HasDot = false;
             for (int newI = i-NeighborDist; newI <= i+NeighborDist; newI++) {
+                if (newI < 0 || newI >= SIZE)
+                    continue;
+
                 for (int newJ = j-NeighborDist; newJ <= j+NeighborDist; newJ++) {
-                    Point newPoint(newI, newJ);
-                    if (is_spot_on_board(newPoint) && !is_spot_valid(newPoint)) {
-                        ok = true;
+                    if (newJ < 0 || newJ >= SIZE)
+                        continue;
+
+                    if (!is_spot_valid(Point(newI, newJ))) {
+                        HasDot = true;
                         break;
                     }
                 }
-                if (ok)
+                if (HasDot)
                     break;
             }
-            if (ok)
+            if (HasDot)
                 places.push_back(Point(i, j));
         }
     }
