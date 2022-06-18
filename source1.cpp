@@ -7,7 +7,7 @@
 #include <map>
 #include <utility>
 #define DEBUG 0
-#define MXDEPTH 1
+#define MXDEPTH 2
 
 enum SPOT_STATE {
     EMPTY = 0,
