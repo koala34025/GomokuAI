@@ -5,6 +5,7 @@
 #include <array>
 #include <list>
 #include <map>
+#define DEBUG 1
 
 enum SPOT_STATE {
     EMPTY = 0,
@@ -12,7 +13,7 @@ enum SPOT_STATE {
     WHITE = 2
 };
 
-const int oneValue = 10; // Consider a dot if it has neighbor ally dots(square)
+const int oneValue = 10; // Consider a dot if it in the star of another one
 const int twoValue = 100;
 const int deathThreeValue = 100;
 const int threeValue = 1000;
@@ -74,7 +75,9 @@ bool is_spot_valid(Point center) {
     return true;
 }
 
-bool HasNeighborInValidSpot(Point p, int neighborDist, bool checkAlly) {
+int HasNeighborInValidSpot(Point p, int neighborDist, int checkAlly) { 
+    // checkAlly: 1 for true, 0 for false, -1 for checkEnemy
+    int cnt = 0;
     for (int newI = p.x - neighborDist; newI <= p.x + neighborDist; newI++) {
         if (newI < 0 || newI >= SIZE)
             continue;
@@ -82,19 +85,26 @@ bool HasNeighborInValidSpot(Point p, int neighborDist, bool checkAlly) {
         for (int newJ = p.y - neighborDist; newJ <= p.y + neighborDist; newJ++) {
             if (newJ < 0 || newJ >= SIZE)
                 continue;
+            if (newI == p.x && newJ == p.y)
+                continue;
 
-            if (!checkAlly) {
-                if (!is_spot_valid(Point(newI, newJ))) {
-                    return true;
+            Point newP(newI, newJ);
+            if (checkAlly == 0) {
+                if (!is_spot_valid(newP)) {
+                    cnt++;
                 }
             }
-            else {
-                if (is_disc_at(Point(newI, newJ), get_disc(p)))
-                    return true;
+            else if(checkAlly == 1){
+                if (get_disc(newP) == get_disc(p))
+                    cnt++;
+            }
+            else if (checkAlly == -1) {
+                if (get_disc(newP) == (3 - get_disc(p)))
+                    cnt++;
             }
         }
     }
-    return false;
+    return cnt;
 }
 
 // Generate a placement if it is in square(5x5) of a dot
@@ -106,7 +116,7 @@ std::list<Point> GeneratePlaces() {
             if (!is_spot_valid(Point(i, j)))
                 continue;
             
-            if (HasNeighborInValidSpot(Point(i, j), 2, false))
+            if (HasNeighborInValidSpot(Point(i, j), 2, 0))
                 places.push_back(Point(i, j));
         }
     }
@@ -1118,7 +1128,9 @@ int OneCount(int who) {
             if (get_disc(p) != who)
                 continue;
 
-            if (HasNeighborInValidSpot(p, 2, true))
+            if (HasNeighborInValidSpot(p, 1, 1))
+                cnt += 2;
+            if (HasNeighborInValidSpot(p, 1, -1))
                 cnt++;
         }
     }
@@ -1129,40 +1141,46 @@ int OneCount(int who) {
 int OverallScore(int who) {
     int score = 0, tmpCnt;
 
+    if (DEBUG)
+        std::cout << "For " << ((who == 1) ? "O" : "X");
+
     tmpCnt = OneCount(who);
     score += tmpCnt * oneValue;
-    //if (tmpCnt > 0)
-        //std::cout << "OneCount: " << tmpCnt << '\n';
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", OneCount: " << tmpCnt;
 
     tmpCnt = TwoCount(who);
     score += tmpCnt * twoValue;
-    //if (tmpCnt > 0)
-        //std::cout << "TwoCount: " << tmpCnt << '\n';
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", TwoCount: " << tmpCnt;
 
     tmpCnt = DeathThreeCount(who);
     score += tmpCnt * deathThreeValue;
-    //if (tmpCnt > 0)
-        //std::cout << "DeathThreeCount: " << tmpCnt << '\n';
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", DeathThreeCount: " << tmpCnt;
 
     tmpCnt = ThreeCount(who);
     score += tmpCnt * threeValue;
-    //if (tmpCnt > 0)
-        //std::cout << "ThreeCount: " << tmpCnt << '\n';
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", ThreeCount: " << tmpCnt;
 
     tmpCnt = DeathFourCount(who);
     score += tmpCnt * deathFourValue;
-    //if (tmpCnt > 0)
-        //std::cout << "DeathFourCount: " << tmpCnt << '\n';
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", DeathFourCount: " << tmpCnt;
 
     tmpCnt = FourCount(who);
     score += tmpCnt * fourValue;
-    //if (tmpCnt > 0)
-        //std::cout << "FourCount: " << tmpCnt << '\n';
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", FourCount: " << tmpCnt;
 
     tmpCnt = FiveCount(who);
     score += tmpCnt * fiveValue;
-    //if(tmpCnt > 0)
-        //std::cout << "FiveCount: " << tmpCnt << '\n';
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", FiveCount: " << tmpCnt;
+
+    if (DEBUG)
+        std::cout << "\n";
 
     return score;
 }
@@ -1193,7 +1211,9 @@ void write_valid_spot(std::ofstream& fout) {
     Point PlacePoint;
     int maxEval = -1e9;
     for (Point p : GeneratePlaces()) {
-        //std::cout << "Trying: (" << p.x << " " << p.y << ")\n";
+        if (DEBUG)
+            std::cout << "Trying " << ((player == 1) ? "O" : "X") << " on (" << p.x << " " << p.y << ")\n";
+
         set_disc(p, player);
         int eval = Evaluate();
         if (eval > maxEval) {
