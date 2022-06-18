@@ -6,8 +6,8 @@
 #include <list>
 #include <map>
 #include <utility>
-#define DEBUG 0
-#define MXDEPTH 2
+#define DEBUG 1
+#define MXDEPTH 1
 
 enum SPOT_STATE {
     EMPTY = 0,
@@ -15,7 +15,7 @@ enum SPOT_STATE {
     WHITE = 2
 };
 
-const int oneValue = 2; // Consider a dot if it in the star of another one
+const int oneValue = 2; 
 const int twoValue = 100;
 const int deathThreeValue = 100;
 const int threeValue = 1000;
@@ -32,6 +32,7 @@ const int INF = 1e9;
 
 struct Point {
     int x, y;
+    int h;
     Point() : Point(0, 0) {}
     Point(float x, float y) : x(x), y(y) {}
     bool operator==(const Point& rhs) const {
@@ -46,7 +47,12 @@ struct Point {
     Point operator-(const Point& rhs) const {
         return Point(x - rhs.x, y - rhs.y);
     }
+    bool operator<(const Point& rhs) const {
+        return h > rhs.h;
+    }
 };
+
+void OrderMoves(std::list<Point>&, int);
 
 int get_next_player(int player) {
     return 3 - player;
@@ -109,8 +115,8 @@ bool HasNeighborInValidSpot(Point p, int neighborDist, int checkAlly) {
     return false;
 }
 
-// Generate a placement if it is in square(5x5) of a dot
 std::list<Point> GeneratePlaces() {
+    // Generate a placement if it is in square(5x5) of a dot
     std::list<Point> places;
     
     for (int i = 0; i < SIZE; i++) {
@@ -134,7 +140,7 @@ int FiveCount(int who) {
 
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
                 if (board[i][j + k] != goal[k]) {
@@ -149,7 +155,7 @@ int FiveCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 5; i++) {
+    for (int i = 0; i <= SIZE - 5; i++) {
         for (int j = 0; j < SIZE; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
@@ -165,8 +171,8 @@ int FiveCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 5; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+    for (int i = 0; i <= SIZE - 5; i++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
                 if (board[i + k][j + k] != goal[k]) {
@@ -182,7 +188,7 @@ int FiveCount(int who) {
 
     // Check diagonally "/"
     for (int i = 4; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
                 if (board[i - k][j + k] != goal[k]) {
@@ -205,7 +211,7 @@ int FourCount(int who) {
 
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             bool ok = true;
             for (int k = 0; k < 6; k++) {
                 if (board[i][j + k] != goal[k]) {
@@ -220,7 +226,7 @@ int FourCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 6; i++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
         for (int j = 0; j < SIZE; j++) {
             bool ok = true;
             for (int k = 0; k < 6; k++) {
@@ -236,8 +242,8 @@ int FourCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 6; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             bool ok = true;
             for (int k = 0; k < 6; k++) {
                 if (board[i + k][j + k] != goal[k]) {
@@ -253,7 +259,7 @@ int FourCount(int who) {
 
     // Check diagonally "/"
     for (int i = 5; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             bool ok = true;
             for (int k = 0; k < 6; k++) {
                 if (board[i - k][j + k] != goal[k]) {
@@ -278,7 +284,7 @@ int DeathFourCount(int who) {
 
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             bool ok = true;
             if ((board[i][j] == EMPTY && board[i][j + 5] == opponent) ||
                 (board[i][j] == opponent && board[i][j + 5] == EMPTY)) {
@@ -299,7 +305,7 @@ int DeathFourCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 6; i++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
         for (int j = 0; j < SIZE; j++) {
             bool ok = true;
             if ((board[i][j] == EMPTY && board[i + 5][j] == opponent) ||
@@ -321,8 +327,8 @@ int DeathFourCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 6; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             bool ok = true;
             if ((board[i][j] == EMPTY && board[i + 5][j + 5] == opponent) ||
                 (board[i][j] == opponent && board[i + 5][j + 5] == EMPTY)) {
@@ -344,7 +350,7 @@ int DeathFourCount(int who) {
 
     // Check diagonally "/"
     for (int i = 5; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             bool ok = true;
             if ((board[i][j] == EMPTY && board[i - 5][j + 5] == opponent) ||
                 (board[i][j] == opponent && board[i - 5][j + 5] == EMPTY)) {
@@ -367,7 +373,7 @@ int DeathFourCount(int who) {
     // Goal = 0111010, 2111010, 0111012 - 0111100 etc.
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 7; j++) {
+        for (int j = 0; j <= SIZE - 7; j++) {
             int myDotCnt = 0;
             if ((board[i][j] == EMPTY && board[i][j + 6] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i][j + 6] == opponent) ||
@@ -393,7 +399,7 @@ int DeathFourCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 7; i++) {
+    for (int i = 0; i <= SIZE - 7; i++) {
         for (int j = 0; j < SIZE; j++) {
             int myDotCnt = 0;
             if ((board[i][j] == EMPTY && board[i + 6][j] == EMPTY) ||
@@ -420,8 +426,8 @@ int DeathFourCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 7; i++) {
-        for (int j = 0; j < SIZE - 7; j++) {
+    for (int i = 0; i <= SIZE - 7; i++) {
+        for (int j = 0; j <= SIZE - 7; j++) {
             int myDotCnt = 0;
             if ((board[i][j] == EMPTY && board[i + 6][j + 6] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i + 6][j + 6] == opponent) ||
@@ -448,7 +454,7 @@ int DeathFourCount(int who) {
 
     // Check diagonally "/"
     for (int i = 6; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 7; j++) {
+        for (int j = 0; j <= SIZE - 7; j++) {
             int myDotCnt = 0;
             if ((board[i][j] == EMPTY && board[i - 6][j + 6] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i - 6][j + 6] == opponent) ||
@@ -482,7 +488,7 @@ int ThreeCount(int who) {
 
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
                 if (board[i][j + k] != goal[k]) {
@@ -497,7 +503,7 @@ int ThreeCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 5; i++) {
+    for (int i = 0; i <= SIZE - 5; i++) {
         for (int j = 0; j < SIZE; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
@@ -513,8 +519,8 @@ int ThreeCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 5; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+    for (int i = 0; i <= SIZE - 5; i++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
                 if (board[i + k][j + k] != goal[k]) {
@@ -530,7 +536,7 @@ int ThreeCount(int who) {
 
     // Check diagonally "/"
     for (int i = 4; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
                 if (board[i - k][j + k] != goal[k]) {
@@ -549,7 +555,7 @@ int ThreeCount(int who) {
 
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             int myDotCnt = 0;
             if (board[i][j] == EMPTY && board[i][j + 5] == EMPTY) {
                 if ((board[i][j + 1] & board[i][j + 2] & board[i][j + 3]) ||
@@ -573,7 +579,7 @@ int ThreeCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 6; i++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
         for (int j = 0; j < SIZE; j++) {
             int myDotCnt = 0;
             if (board[i][j] == EMPTY && board[i + 5][j] == EMPTY) {
@@ -598,8 +604,8 @@ int ThreeCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 6; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             int myDotCnt = 0;
             if (board[i][j] == EMPTY && board[i + 5][j + 5] == EMPTY) {
                 if ((board[i + 1][j + 1] & board[i + 2][j + 2] & board[i + 3][j + 3]) ||
@@ -624,7 +630,7 @@ int ThreeCount(int who) {
 
     // Check diagonally "/"
     for (int i = 5; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             int myDotCnt = 0;
             if (board[i][j] == EMPTY && board[i - 5][j + 5] == EMPTY) {
                 if ((board[i - 1][j + 1] & board[i - 2][j + 2] & board[i - 3][j + 3]) ||
@@ -658,7 +664,7 @@ int DeathThreeCount(int who) {
 
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             if ((board[i][j] == EMPTY && board[i][j + 4] == opponent) ||
                 (board[i][j] == opponent && board[i][j + 4] == EMPTY)) {
@@ -679,7 +685,7 @@ int DeathThreeCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 5; i++) {
+    for (int i = 0; i <= SIZE - 5; i++) {
         for (int j = 0; j < SIZE; j++) {
             bool ok = true;
             if ((board[i][j] == EMPTY && board[i + 4][j] == opponent) ||
@@ -701,8 +707,8 @@ int DeathThreeCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 5; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+    for (int i = 0; i <= SIZE - 5; i++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             if ((board[i][j] == EMPTY && board[i + 4][j + 4] == opponent) ||
                 (board[i][j] == opponent && board[i + 4][j + 4] == EMPTY)) {
@@ -724,7 +730,7 @@ int DeathThreeCount(int who) {
 
     // Check diagonally "/"
     for (int i = 4; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             if ((board[i][j] == EMPTY && board[i - 4][j + 4] == opponent) ||
                 (board[i][j] == opponent && board[i - 4][j + 4] == EMPTY)) {
@@ -744,14 +750,17 @@ int DeathThreeCount(int who) {
         }
     }
 
-    // Goal = 011010, 211010, 011012
+    // Goal = 211010, 011012 - 011010
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             int myDotCnt = 0;
-            if ((board[i][j] == EMPTY && board[i][j + 5] == EMPTY) ||
-                (board[i][j] == EMPTY && board[i][j + 5] == opponent) ||
+            if ((board[i][j] == EMPTY && board[i][j + 5] == opponent) ||
                 (board[i][j] == opponent && board[i][j + 5] == EMPTY)) {
+                if ((board[i][j + 1] & board[i][j + 2] & board[i][j + 3]) ||
+                    (board[i][j + 4] & board[i][j + 2] & board[i][j + 3])) {
+                    continue;
+                }
                 for (int k = 0; k < 4; k++) {
                     if (board[i][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -769,12 +778,15 @@ int DeathThreeCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 6; i++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
         for (int j = 0; j < SIZE; j++) {
             int myDotCnt = 0;
-            if ((board[i][j] == EMPTY && board[i + 5][j] == EMPTY) ||
-                (board[i][j] == EMPTY && board[i + 5][j] == opponent) ||
+            if ((board[i][j] == EMPTY && board[i + 5][j] == opponent) ||
                 (board[i][j] == opponent && board[i + 5][j] == EMPTY)) {
+                if ((board[i + 1][j] & board[i + 2][j] & board[i + 3][j]) ||
+                    (board[i + 4][j] & board[i + 2][j] & board[i + 3][j])) {
+                    continue;
+                }
                 for (int k = 0; k < 4; k++) {
                     if (board[i + 1 + k][j] == opponent) {
                         myDotCnt = 0;
@@ -792,12 +804,15 @@ int DeathThreeCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 6; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             int myDotCnt = 0;
-            if ((board[i][j] == EMPTY && board[i + 5][j + 5] == EMPTY) ||
-                (board[i][j] == EMPTY && board[i + 5][j + 5] == opponent) ||
+            if ((board[i][j] == EMPTY && board[i + 5][j + 5] == opponent) ||
                 (board[i][j] == opponent && board[i + 5][j + 5] == EMPTY)) {
+                if ((board[i + 1][j + 1] & board[i + 2][j + 2] & board[i + 3][j + 3]) ||
+                    (board[i + 4][j + 4] & board[i + 2][j + 2] & board[i + 3][j + 3])) {
+                    continue;
+                }
                 for (int k = 0; k < 4; k++) {
                     if (board[i + 1 + k][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -816,11 +831,14 @@ int DeathThreeCount(int who) {
 
     // Check diagonally "/"
     for (int i = 5; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             int myDotCnt = 0;
-            if ((board[i][j] == EMPTY && board[i - 5][j + 5] == EMPTY) ||
-                (board[i][j] == EMPTY && board[i - 5][j + 5] == opponent) ||
+            if ((board[i][j] == EMPTY && board[i - 5][j + 5] == opponent) ||
                 (board[i][j] == opponent && board[i - 5][j + 5] == EMPTY)) {
+                if ((board[i - 1][j + 1] & board[i - 2][j + 2] & board[i - 3][j + 3]) ||
+                    (board[i - 4][j + 4] & board[i - 2][j + 2] & board[i - 3][j + 3])) {
+                    continue;
+                }
                 for (int k = 0; k < 4; k++) {
                     if (board[i - 1 - k][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -840,11 +858,16 @@ int DeathThreeCount(int who) {
     // Goal = 0110010, 2110010, 0110012
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 7; j++) {
+        for (int j = 0; j <= SIZE - 7; j++) {
             int myDotCnt = 0;
             if ((board[i][j] == EMPTY && board[i][j + 6] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i][j + 6] == opponent) ||
                 (board[i][j] == opponent && board[i][j + 6] == EMPTY)) {
+                if ((board[i][j + 1] & board[i][j + 2] & board[i][j + 3]) ||
+                    (board[i][j + 4] & board[i][j + 2] & board[i][j + 3]) ||
+                    (board[i][j + 4] & board[i][j + 5] & board[i][j + 3])) {
+                    continue;
+                }
                 for (int k = 0; k < 5; k++) {
                     if (board[i][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -862,12 +885,17 @@ int DeathThreeCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 7; i++) {
+    for (int i = 0; i <= SIZE - 7; i++) {
         for (int j = 0; j < SIZE; j++) {
             int myDotCnt = 0;
             if ((board[i][j] == EMPTY && board[i + 6][j] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i + 6][j] == opponent) ||
                 (board[i][j] == opponent && board[i + 6][j] == EMPTY)) {
+                if ((board[i + 1][j] & board[i + 2][j] & board[i + 3][j]) ||
+                    (board[i + 4][j] & board[i + 2][j] & board[i + 3][j]) ||
+                    (board[i + 4][j] & board[i + 5][j] & board[i + 3][j])) {
+                    continue;
+                }
                 for (int k = 0; k < 5; k++) {
                     if (board[i + 1 + k][j] == opponent) {
                         myDotCnt = 0;
@@ -885,12 +913,17 @@ int DeathThreeCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 7; i++) {
-        for (int j = 0; j < SIZE - 7; j++) {
+    for (int i = 0; i <= SIZE - 7; i++) {
+        for (int j = 0; j <= SIZE - 7; j++) {
             int myDotCnt = 0;
             if ((board[i][j] == EMPTY && board[i + 6][j + 6] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i + 6][j + 6] == opponent) ||
                 (board[i][j] == opponent && board[i + 6][j + 6] == EMPTY)) {
+                if ((board[i + 1][j + 1] & board[i + 2][j + 2] & board[i + 3][j + 3]) ||
+                    (board[i + 4][j + 4] & board[i + 2][j + 2] & board[i + 3][j + 3]) ||
+                    (board[i + 4][j + 4] & board[i + 5][j + 5] & board[i + 3][j + 3])) {
+                    continue;
+                }
                 for (int k = 0; k < 5; k++) {
                     if (board[i + 1 + k][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -909,11 +942,16 @@ int DeathThreeCount(int who) {
 
     // Check diagonally "/"
     for (int i = 6; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 7; j++) {
+        for (int j = 0; j <= SIZE - 7; j++) {
             int myDotCnt = 0;
             if ((board[i][j] == EMPTY && board[i - 6][j + 6] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i - 6][j + 6] == opponent) ||
                 (board[i][j] == opponent && board[i - 6][j + 6] == EMPTY)) {
+                if ((board[i - 1][j + 1] & board[i - 2][j + 2] & board[i - 3][j + 3]) ||
+                    (board[i - 4][j + 4] & board[i - 2][j + 2] & board[i - 3][j + 3]) ||
+                    (board[i - 4][j + 4] & board[i - 5][j + 5] & board[i - 3][j + 3])) {
+                    continue;
+                }
                 for (int k = 0; k < 5; k++) {
                     if (board[i - 1 - k][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -943,7 +981,7 @@ int TwoCount(int who) {
     // Goal 1
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 4; j++) {
+        for (int j = 0; j <= SIZE - 4; j++) {
             bool ok = true;
             for (int k = 0; k < 4; k++) {
                 if (board[i][j + k] != goal_1[k]) {
@@ -958,7 +996,7 @@ int TwoCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 4; i++) {
+    for (int i = 0; i <= SIZE - 4; i++) {
         for (int j = 0; j < SIZE; j++) {
             bool ok = true;
             for (int k = 0; k < 4; k++) {
@@ -974,8 +1012,8 @@ int TwoCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 4; i++) {
-        for (int j = 0; j < SIZE - 4; j++) {
+    for (int i = 0; i <= SIZE - 4; i++) {
+        for (int j = 0; j <= SIZE - 4; j++) {
             bool ok = true;
             for (int k = 0; k < 4; k++) {
                 if (board[i + k][j + k] != goal_1[k]) {
@@ -991,7 +1029,7 @@ int TwoCount(int who) {
 
     // Check diagonally "/"
     for (int i = 3; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 4; j++) {
+        for (int j = 0; j <= SIZE - 4; j++) {
             bool ok = true;
             for (int k = 0; k < 4; k++) {
                 if (board[i - k][j + k] != goal_1[k]) {
@@ -1008,7 +1046,7 @@ int TwoCount(int who) {
     // Goal 2
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
                 if (board[i][j + k] != goal_2[k]) {
@@ -1023,7 +1061,7 @@ int TwoCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 5; i++) {
+    for (int i = 0; i <= SIZE - 5; i++) {
         for (int j = 0; j < SIZE; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
@@ -1039,8 +1077,8 @@ int TwoCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 5; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+    for (int i = 0; i <= SIZE - 5; i++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
                 if (board[i + k][j + k] != goal_2[k]) {
@@ -1056,7 +1094,7 @@ int TwoCount(int who) {
 
     // Check diagonally "/"
     for (int i = 4; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 5; j++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
             bool ok = true;
             for (int k = 0; k < 5; k++) {
                 if (board[i - k][j + k] != goal_2[k]) {
@@ -1073,7 +1111,7 @@ int TwoCount(int who) {
     // Goal 3
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             bool ok = true;
             for (int k = 0; k < 6; k++) {
                 if (board[i][j + k] != goal_3[k]) {
@@ -1088,7 +1126,7 @@ int TwoCount(int who) {
     }
 
     // Check vertically
-    for (int i = 0; i < SIZE - 6; i++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
         for (int j = 0; j < SIZE; j++) {
             bool ok = true;
             for (int k = 0; k < 6; k++) {
@@ -1104,8 +1142,8 @@ int TwoCount(int who) {
     }
 
     // Check diagonally "\"
-    for (int i = 0; i < SIZE - 6; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+    for (int i = 0; i <= SIZE - 6; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             bool ok = true;
             for (int k = 0; k < 6; k++) {
                 if (board[i + k][j + k] != goal_3[k]) {
@@ -1121,7 +1159,7 @@ int TwoCount(int who) {
 
     // Check diagonally "/"
     for (int i = 5; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 6; j++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
             bool ok = true;
             for (int k = 0; k < 6; k++) {
                 if (board[i - k][j + k] != goal_3[k]) {
@@ -1225,6 +1263,7 @@ std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
     }
 
     std::list<Point> places = GeneratePlaces();
+    OrderMoves(places, who);
 
     if (places.empty()) {
         return { 0, Point(7, 7) };
@@ -1232,6 +1271,8 @@ std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
 
     Point PlacePoint;
     for (Point p : places) {
+        if (DEBUG)
+            std::cout << "Trying " << (who == 1 ? "O" : "X") << " on (" << p.x << ' ' << p.y << ")\n";
         set_disc(p, who);
         int evaluation = -AlphaBeta(depth - 1, -beta, -alpha, get_next_player(who)).first;
         set_disc(p, EMPTY);
@@ -1245,6 +1286,220 @@ std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
     }
 
     return { alpha, PlacePoint };
+}
+
+//---------------------------------------------------------------------------------------------------------------//
+
+void OrderMoves(std::list<Point>& places, int who) {
+    int opponent = get_next_player(who);
+    for (Point& p : places) {
+        int heuristic = 0;
+
+        std::array<std::array<int, 9>, 4> star = { 0 };
+        for (int i = -4; i <= 4; i++) {
+            star[0][i + 4] = board[p.x + i][p.y];
+            star[1][i + 4] = board[p.x + i][p.y + i];
+            star[2][i + 4] = board[p.x][p.y + i];
+            star[3][i + 4] = board[p.x - i][p.y + i];
+        }
+        
+        // 11111
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (star[i][j] == star[i][j + 1] &&
+                    star[i][j + 1] == star[i][j + 2] &&
+                    star[i][j + 2] == star[i][j + 3] &&
+                    star[i][j + 3] == star[i][j + 4] &&
+                    star[i][j + 4] == who)
+                    heuristic += fiveValue;
+            }
+        }
+
+        // 011110
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (star[i][j] == EMPTY && star[i][j+5] == EMPTY)
+                    if (star[i][j + 1] == star[i][j + 2] &&
+                        star[i][j + 2] == star[i][j + 3] &&
+                        star[i][j + 3] == star[i][j + 4] &&
+                        star[i][j + 4] == who)
+                        heuristic += fourValue;
+            }
+        }
+
+        // 011112
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if ((star[i][j] == EMPTY && star[i][j + 5] == opponent) ||
+                    (star[i][j] == opponent && star[i][j + 5] == EMPTY)) {
+                    if (star[i][j + 1] == star[i][j + 2] &&
+                        star[i][j + 2] == star[i][j + 3] &&
+                        star[i][j + 3] == star[i][j + 4] &&
+                        star[i][j + 4] == who)
+                        heuristic += deathFourValue;
+                }
+            }
+        }
+
+        // Goal = 0111010, 2111010, 0111012 - 0111100 etc.
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
+                int myDotCnt = 0;
+                if ((star[i][j] == EMPTY && star[i][j + 6] == EMPTY) ||
+                    (star[i][j] == EMPTY && star[i][j + 6] == opponent) ||
+                    (star[i][j] == opponent && star[i][j + 6] == EMPTY)) {
+                    if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3] & star[i][j + 4]) ||
+                        (star[i][j + 5] & star[i][j + 2] & star[i][j + 3] & star[i][j + 4])) {
+                        continue;
+                    }
+                    for (int k = 0; k < 5; k++) {
+                        if (star[i][j + 1 + k] == opponent) {
+                            myDotCnt = 0;
+                            break;
+                        }
+                        if (star[i][j + 1 + k] == who) {
+                            myDotCnt++;
+                        }
+                    }
+                }
+                if (myDotCnt == 4) {
+                    heuristic += deathFourValue;
+                }
+            }
+        }
+
+        // 01110
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (star[i][j] == EMPTY && star[i][j + 4] == EMPTY)
+                    if (star[i][j + 1] == star[i][j + 2] &&
+                        star[i][j + 2] == star[i][j + 3] &&
+                        star[i][j + 3] == who)
+                        heuristic += threeValue;
+            }
+        }
+
+        // 011010
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                int myDotCnt = 0;
+                if (star[i][j] == EMPTY && star[i][j + 5] == EMPTY) {
+                    if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3]) ||
+                        (star[i][j + 4] & star[i][j + 2] & star[i][j + 3])) {
+                        continue;
+                    }
+                    for (int k = 0; k < 4; k++) {
+                        if (star[i][j + 1 + k] == opponent) {
+                            myDotCnt = 0;
+                            break;
+                        }
+                        if (star[i][j + 1 + k] == who) {
+                            myDotCnt++;
+                        }
+                    }
+                }
+                if (myDotCnt == 3) {
+                    heuristic += threeValue;
+                }
+            }
+        }
+
+        // 21110
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 5; j++) {
+                if ((star[i][j] == EMPTY && star[i][j + 4] == opponent) ||
+                    (star[i][j] == opponent && star[i][j + 4] == EMPTY)) {
+                    if (star[i][j + 1] == star[i][j + 2] &&
+                        star[i][j + 2] == star[i][j + 3] &&
+                        star[i][j + 3] == who)
+                        heuristic += deathThreeValue;
+                }
+            }
+        }
+
+        // 211010 - 011010
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                int myDotCnt = 0;
+                if ((star[i][j] == EMPTY && star[i][j + 5] == opponent) ||
+                    (star[i][j] == opponent && star[i][j + 5] == EMPTY)) {
+                    if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3]) ||
+                        (star[i][j + 4] & star[i][j + 2] & star[i][j + 3])) {
+                        continue;
+                    }
+                    for (int k = 0; k < 4; k++) {
+                        if (star[i][j + 1 + k] == opponent) {
+                            myDotCnt = 0;
+                            break;
+                        }
+                        if (star[i][j + 1 + k] == who) {
+                            myDotCnt++;
+                        }
+                    }
+                }
+                if (myDotCnt == 3) {
+                    heuristic += deathThreeValue;
+                }
+            }
+        }
+
+        // 0110010, 2110010, 0110012
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
+                int myDotCnt = 0;
+                if ((star[i][j] == EMPTY && star[i][j + 6] == EMPTY) ||
+                    (star[i][j] == EMPTY && star[i][j + 6] == opponent) ||
+                    (star[i][j] == opponent && star[i][j + 6] == EMPTY)) {
+                    if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3]) ||
+                        (star[i][j + 4] & star[i][j + 2] & star[i][j + 3]) ||
+                        (star[i][j + 4] & star[i][j + 5] & star[i][j + 3])) {
+                        continue;
+                    }
+                    for (int k = 0; k < 5; k++) {
+                        if (star[i][j + 1 + k] == opponent) {
+                            myDotCnt = 0;
+                            break;
+                        }
+                        if (star[i][j + 1 + k] == who) {
+                            myDotCnt++;
+                        }
+                    }
+                }
+                if (myDotCnt == 3) {
+                    heuristic += deathThreeValue;
+                }
+            }
+        }
+
+        // Goal = 0110, 01010, 010010
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (star[i][j] == EMPTY && star[i][j + 3] == EMPTY)
+                    if (star[i][j + 1] == star[i][j + 2] &&
+                        star[i][j + 2] == who)
+                        heuristic += twoValue;
+            }
+        }
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (star[i][j] == EMPTY && star[i][j + 2] == EMPTY && star[i][j + 4] == EMPTY)
+                    if (star[i][j + 1] == star[i][j + 3] &&
+                        star[i][j + 3] == who)
+                        heuristic += twoValue;
+            }
+        }
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (star[i][j] == EMPTY && star[i][j + 2] == EMPTY && star[i][j + 3] == EMPTY && star[i][j + 5] == EMPTY)
+                    if (star[i][j + 1] == star[i][j + 4] &&
+                        star[i][j + 4] == who)
+                        heuristic += twoValue;
+            }
+        }
+        
+        p.h = heuristic;
+    }
+    places.sort();
 }
 
 //---------------------------------------------------------------------------------------------------------------//
@@ -1265,26 +1520,6 @@ void write_valid_spot(std::ofstream& fout) {
     Point PlacePoint;
     
     PlacePoint = AlphaBeta(MXDEPTH, -INF, INF, player).second;
-
-    /*std::list<Point> places = GeneratePlaces();
-    if (places.empty()) {
-        PlacePoint.x = PlacePoint.y = 7;
-    }
-    else {
-        int maxEval = -INF;
-        for (Point p : places) {
-            if (DEBUG)
-                std::cout << "Trying " << ((player == 1) ? "O" : "X") << " on (" << p.x << " " << p.y << ")\n";
-
-            set_disc(p, player);
-            int eval = Evaluate(player);
-            if (eval > maxEval) {
-                maxEval = eval;
-                PlacePoint = p;
-            }
-            set_disc(p, EMPTY);
-        }
-    }*/
 
     fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
     // Remember to flush the output to ensure the last action is written to file.
