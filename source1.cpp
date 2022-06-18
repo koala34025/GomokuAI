@@ -294,8 +294,6 @@ int DeathFourCount(int who) {
                 ok = false;
             }
             if (ok) {
-                if (DEBUG)
-                    std::cout << "\nA" << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -318,8 +316,6 @@ int DeathFourCount(int who) {
                 ok = false;
             }
             if (ok) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -342,8 +338,6 @@ int DeathFourCount(int who) {
                 ok = false;
             }
             if (ok) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -366,8 +360,6 @@ int DeathFourCount(int who) {
                 ok = false;
             }
             if (ok) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -396,8 +388,6 @@ int DeathFourCount(int who) {
                 }
             }
             if (myDotCnt == 4) {
-                if (DEBUG)
-                    std::cout << "A\n" << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -425,8 +415,6 @@ int DeathFourCount(int who) {
                 }
             }
             if (myDotCnt == 4) {
-                if (DEBUG)
-                    std::cout << "B\n" << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -454,8 +442,6 @@ int DeathFourCount(int who) {
                 }
             }
             if (myDotCnt == 4) {
-                if (DEBUG)
-                    std::cout << "C\n" << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -483,8 +469,6 @@ int DeathFourCount(int who) {
                 }
             }
             if (myDotCnt == 4) {
-                if (DEBUG)
-                    std::cout << "D\n" << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -508,8 +492,6 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -526,8 +508,6 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -544,8 +524,6 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -562,8 +540,6 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -592,8 +568,6 @@ int ThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -619,8 +593,6 @@ int ThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -646,8 +618,6 @@ int ThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -673,8 +643,6 @@ int ThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                if (DEBUG)
-                    std::cout << '\n' << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -706,7 +674,6 @@ int DeathThreeCount(int who) {
                 ok = false;
             }
             if (ok) {
-                //std::cout << "l: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -729,7 +696,6 @@ int DeathThreeCount(int who) {
                 ok = false;
             }
             if (ok) {
-                //std::cout << "k: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -752,7 +718,6 @@ int DeathThreeCount(int who) {
                 ok = false;
             }
             if (ok) {
-                //std::cout << "j: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -775,7 +740,6 @@ int DeathThreeCount(int who) {
                 ok = false;
             }
             if (ok) {
-                //std::cout << "i: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -800,7 +764,6 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                //std::cout << "h: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -824,7 +787,6 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                //std::cout << "g: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -848,7 +810,6 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                //std::cout << "f: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -872,7 +833,6 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                //std::cout << "e: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -897,7 +857,6 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                //std::cout << "d: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -921,7 +880,6 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                //std::cout << "c: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -945,7 +903,6 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                //std::cout << "b: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
@@ -969,7 +926,6 @@ int DeathThreeCount(int who) {
                 }
             }
             if (myDotCnt == 3) {
-                //std::cout << "a: " << i << ' ' << j << '\n';
                 cnt++;
             }
         }
