@@ -65,6 +65,7 @@ struct PointLesser {
 };
 
 void OrderMoves(std::list<Point>&, int);
+int GetHeuristic(Point, int);
 
 int get_next_player(int player) {
     return 3 - player;
@@ -1367,227 +1368,11 @@ std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
 //---------------------------------------------------------------------------------------------------------------//
 
 void OrderMoves(std::list<Point>& places, int who) {
-    int opponent = get_next_player(who);
-
     for (Point& p : places) {
+        int oldHeuristic = GetHeuristic(p, who);
         set_disc(p, who);
-        int heuristic = 0;
-
-        std::array<std::array<int, 9>, 4> star;
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 9; j++) {
-                star[i][j] = -1;
-            }
-        }
-        for (int i = -4; i <= 4; i++) {
-            if (is_spot_on_board(Point(p.x + i, p.y)))
-                star[0][i + 4] = board[p.x + i][p.y];
-
-            if (is_spot_on_board(Point(p.x + i, p.y + i)))
-                star[1][i + 4] = board[p.x + i][p.y + i];
-
-            if (is_spot_on_board(Point(p.x, p.y + i)))
-                star[2][i + 4] = board[p.x][p.y + i];
-
-            if (is_spot_on_board(Point(p.x - i, p.y + i)))
-                star[3][i + 4] = board[p.x - i][p.y + i];
-        }
-           
-        // 11111
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (star[i][j] == star[i][j + 1] &&
-                    star[i][j + 1] == star[i][j + 2] &&
-                    star[i][j + 2] == star[i][j + 3] &&
-                    star[i][j + 3] == star[i][j + 4] &&
-                    star[i][j + 4] == who)
-                    heuristic += fiveValue;
-            }
-        }
-
-        // 011110
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                if (star[i][j] == EMPTY && star[i][j+5] == EMPTY)
-                    if (star[i][j + 1] == star[i][j + 2] &&
-                        star[i][j + 2] == star[i][j + 3] &&
-                        star[i][j + 3] == star[i][j + 4] &&
-                        star[i][j + 4] == who)
-                        heuristic += fourValue;
-            }
-        }
-
-        // 011112
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                if ((star[i][j] == EMPTY && star[i][j + 5] == opponent) ||
-                    (star[i][j] == opponent && star[i][j + 5] == EMPTY)) {
-                    if (star[i][j + 1] == star[i][j + 2] &&
-                        star[i][j + 2] == star[i][j + 3] &&
-                        star[i][j + 3] == star[i][j + 4] &&
-                        star[i][j + 4] == who)
-                        heuristic += deathFourValue;
-                }
-            }
-        }
-
-        // Goal = 0111010, 2111010, 0111012 - 0111100 etc.
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 3; j++) {
-                int myDotCnt = 0;
-                if ((star[i][j] == EMPTY && star[i][j + 6] == EMPTY) ||
-                    (star[i][j] == EMPTY && star[i][j + 6] == opponent) ||
-                    (star[i][j] == opponent && star[i][j + 6] == EMPTY)) {
-                    if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3] & star[i][j + 4]) ||
-                        (star[i][j + 5] & star[i][j + 2] & star[i][j + 3] & star[i][j + 4])) {
-                        continue;
-                    }
-                    for (int k = 0; k < 5; k++) {
-                        if (star[i][j + 1 + k] == opponent) {
-                            myDotCnt = 0;
-                            break;
-                        }
-                        if (star[i][j + 1 + k] == who) {
-                            myDotCnt++;
-                        }
-                    }
-                }
-                if (myDotCnt == 4) {
-                    heuristic += deathFourValue;
-                }
-            }
-        }
-
-        // 01110
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (star[i][j] == EMPTY && star[i][j + 4] == EMPTY)
-                    if (star[i][j + 1] == star[i][j + 2] &&
-                        star[i][j + 2] == star[i][j + 3] &&
-                        star[i][j + 3] == who)
-                        heuristic += threeValue;
-            }
-        }
-
-        // 011010
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                int myDotCnt = 0;
-                if (star[i][j] == EMPTY && star[i][j + 5] == EMPTY) {
-                    if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3]) ||
-                        (star[i][j + 4] & star[i][j + 2] & star[i][j + 3])) {
-                        continue;
-                    }
-                    for (int k = 0; k < 4; k++) {
-                        if (star[i][j + 1 + k] == opponent) {
-                            myDotCnt = 0;
-                            break;
-                        }
-                        if (star[i][j + 1 + k] == who) {
-                            myDotCnt++;
-                        }
-                    }
-                }
-                if (myDotCnt == 3) {
-                    heuristic += threeValue;
-                }
-            }
-        }
-
-        // 21110
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 5; j++) {
-                if ((star[i][j] == EMPTY && star[i][j + 4] == opponent) ||
-                    (star[i][j] == opponent && star[i][j + 4] == EMPTY)) {
-                    if (star[i][j + 1] == star[i][j + 2] &&
-                        star[i][j + 2] == star[i][j + 3] &&
-                        star[i][j + 3] == who)
-                        heuristic += deathThreeValue;
-                }
-            }
-        }
-
-        // 211010 - 011010
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                int myDotCnt = 0;
-                if ((star[i][j] == EMPTY && star[i][j + 5] == opponent) ||
-                    (star[i][j] == opponent && star[i][j + 5] == EMPTY)) {
-                    if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3]) ||
-                        (star[i][j + 4] & star[i][j + 2] & star[i][j + 3])) {
-                        continue;
-                    }
-                    for (int k = 0; k < 4; k++) {
-                        if (star[i][j + 1 + k] == opponent) {
-                            myDotCnt = 0;
-                            break;
-                        }
-                        if (star[i][j + 1 + k] == who) {
-                            myDotCnt++;
-                        }
-                    }
-                }
-                if (myDotCnt == 3) {
-                    heuristic += deathThreeValue;
-                }
-            }
-        }
-
-        // 0110010, 2110010, 0110012
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 3; j++) {
-                int myDotCnt = 0;
-                if ((star[i][j] == EMPTY && star[i][j + 6] == EMPTY) ||
-                    (star[i][j] == EMPTY && star[i][j + 6] == opponent) ||
-                    (star[i][j] == opponent && star[i][j + 6] == EMPTY)) {
-                    if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3]) ||
-                        (star[i][j + 4] & star[i][j + 2] & star[i][j + 3]) ||
-                        (star[i][j + 4] & star[i][j + 5] & star[i][j + 3])) {
-                        continue;
-                    }
-                    for (int k = 0; k < 5; k++) {
-                        if (star[i][j + 1 + k] == opponent) {
-                            myDotCnt = 0;
-                            break;
-                        }
-                        if (star[i][j + 1 + k] == who) {
-                            myDotCnt++;
-                        }
-                    }
-                }
-                if (myDotCnt == 3) {
-                    heuristic += deathThreeValue;
-                }
-            }
-        }
-
-        // Goal = 0110, 01010, 010010
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
-                if (star[i][j] == EMPTY && star[i][j + 3] == EMPTY)
-                    if (star[i][j + 1] == star[i][j + 2] &&
-                        star[i][j + 2] == who)
-                        heuristic += twoValue;
-            }
-        }
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (star[i][j] == EMPTY && star[i][j + 2] == EMPTY && star[i][j + 4] == EMPTY)
-                    if (star[i][j + 1] == star[i][j + 3] &&
-                        star[i][j + 3] == who)
-                        heuristic += twoValue;
-            }
-        }
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                if (star[i][j] == EMPTY && star[i][j + 2] == EMPTY && star[i][j + 3] == EMPTY && star[i][j + 5] == EMPTY)
-                    if (star[i][j + 1] == star[i][j + 4] &&
-                        star[i][j + 4] == who)
-                        heuristic += twoValue;
-            }
-        }
-        
-        p.h = heuristic;
+        int newHeuristic = GetHeuristic(p, who);
+        p.h = newHeuristic - oldHeuristic;
         set_disc(p, EMPTY);
     }
     places.sort(PointGreater());
@@ -1646,6 +1431,228 @@ std::pair<int, Point> MiniMax(int depth, int alpha, int beta, int maximizingPlay
         }
         return { minEval, PlacePoint };
     }
+}
+
+//---------------------------------------------------------------------------------------------------------------//
+
+int GetHeuristic(Point p, int who) {
+    int heuristic = 0;
+    int opponent = get_next_player(who);
+
+    std::array<std::array<int, SIZE>, 4> star;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            star[i][j] = -1;
+        }
+    }
+    for (int i = 0; i < SIZE;i++) {
+        star[0][i] = board[i][p.y];
+        star[1][i] = board[p.x][i];
+    }
+    int whichline1 = p.x - p.y;
+    int whichline2 = p.x + p.y;
+    for (int j = 0; j < SIZE; j++) {
+        if (j + whichline1 >= 0 && j + whichline1 < SIZE)
+            star[2][j] = board[j + whichline1][j];
+        if (whichline2 - j >= 0 && whichline2 - j < SIZE)
+            star[3][j] = board[whichline1 - j][j];
+    }
+
+    // 11111
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
+            if (star[i][j] == star[i][j + 1] &&
+                star[i][j + 1] == star[i][j + 2] &&
+                star[i][j + 2] == star[i][j + 3] &&
+                star[i][j + 3] == star[i][j + 4] &&
+                star[i][j + 4] == who)
+                heuristic += fiveValue;
+        }
+    }
+
+    // 011110
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
+            if (star[i][j] == EMPTY && star[i][j + 5] == EMPTY)
+                if (star[i][j + 1] == star[i][j + 2] &&
+                    star[i][j + 2] == star[i][j + 3] &&
+                    star[i][j + 3] == star[i][j + 4] &&
+                    star[i][j + 4] == who)
+                    heuristic += fourValue;
+        }
+    }
+
+    // 011112
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
+            if ((star[i][j] == EMPTY && star[i][j + 5] == opponent) ||
+                (star[i][j] == opponent && star[i][j + 5] == EMPTY)) {
+                if (star[i][j + 1] == star[i][j + 2] &&
+                    star[i][j + 2] == star[i][j + 3] &&
+                    star[i][j + 3] == star[i][j + 4] &&
+                    star[i][j + 4] == who)
+                    heuristic += deathFourValue;
+            }
+        }
+    }
+
+    // Goal = 0111010, 2111010, 0111012 - 0111100 etc.
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 7; j++) {
+            int myDotCnt = 0;
+            if ((star[i][j] == EMPTY && star[i][j + 6] == EMPTY) ||
+                (star[i][j] == EMPTY && star[i][j + 6] == opponent) ||
+                (star[i][j] == opponent && star[i][j + 6] == EMPTY)) {
+                if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3] & star[i][j + 4]) ||
+                    (star[i][j + 5] & star[i][j + 2] & star[i][j + 3] & star[i][j + 4])) {
+                    continue;
+                }
+                for (int k = 0; k < 5; k++) {
+                    if (star[i][j + 1 + k] == opponent) {
+                        myDotCnt = 0;
+                        break;
+                    }
+                    if (star[i][j + 1 + k] == who) {
+                        myDotCnt++;
+                    }
+                }
+            }
+            if (myDotCnt == 4) {
+                heuristic += deathFourValue;
+            }
+        }
+    }
+
+    // 01110
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
+            if (star[i][j] == EMPTY && star[i][j + 4] == EMPTY)
+                if (star[i][j + 1] == star[i][j + 2] &&
+                    star[i][j + 2] == star[i][j + 3] &&
+                    star[i][j + 3] == who)
+                    heuristic += threeValue;
+        }
+    }
+
+    // 011010
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
+            int myDotCnt = 0;
+            if (star[i][j] == EMPTY && star[i][j + 5] == EMPTY) {
+                if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3]) ||
+                    (star[i][j + 4] & star[i][j + 2] & star[i][j + 3])) {
+                    continue;
+                }
+                for (int k = 0; k < 4; k++) {
+                    if (star[i][j + 1 + k] == opponent) {
+                        myDotCnt = 0;
+                        break;
+                    }
+                    if (star[i][j + 1 + k] == who) {
+                        myDotCnt++;
+                    }
+                }
+            }
+            if (myDotCnt == 3) {
+                heuristic += threeValue;
+            }
+        }
+    }
+
+    // 21110
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
+            if ((star[i][j] == EMPTY && star[i][j + 4] == opponent) ||
+                (star[i][j] == opponent && star[i][j + 4] == EMPTY)) {
+                if (star[i][j + 1] == star[i][j + 2] &&
+                    star[i][j + 2] == star[i][j + 3] &&
+                    star[i][j + 3] == who)
+                    heuristic += deathThreeValue;
+            }
+        }
+    }
+
+    // 211010 - 011010
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
+            int myDotCnt = 0;
+            if ((star[i][j] == EMPTY && star[i][j + 5] == opponent) ||
+                (star[i][j] == opponent && star[i][j + 5] == EMPTY)) {
+                if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3]) ||
+                    (star[i][j + 4] & star[i][j + 2] & star[i][j + 3])) {
+                    continue;
+                }
+                for (int k = 0; k < 4; k++) {
+                    if (star[i][j + 1 + k] == opponent) {
+                        myDotCnt = 0;
+                        break;
+                    }
+                    if (star[i][j + 1 + k] == who) {
+                        myDotCnt++;
+                    }
+                }
+            }
+            if (myDotCnt == 3) {
+                heuristic += deathThreeValue;
+            }
+        }
+    }
+
+    // 0110010, 2110010, 0110012
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 7; j++) {
+            int myDotCnt = 0;
+            if ((star[i][j] == EMPTY && star[i][j + 6] == EMPTY) ||
+                (star[i][j] == EMPTY && star[i][j + 6] == opponent) ||
+                (star[i][j] == opponent && star[i][j + 6] == EMPTY)) {
+                if ((star[i][j + 1] & star[i][j + 2] & star[i][j + 3]) ||
+                    (star[i][j + 4] & star[i][j + 2] & star[i][j + 3]) ||
+                    (star[i][j + 4] & star[i][j + 5] & star[i][j + 3])) {
+                    continue;
+                }
+                for (int k = 0; k < 5; k++) {
+                    if (star[i][j + 1 + k] == opponent) {
+                        myDotCnt = 0;
+                        break;
+                    }
+                    if (star[i][j + 1 + k] == who) {
+                        myDotCnt++;
+                    }
+                }
+            }
+            if (myDotCnt == 3) {
+                heuristic += deathThreeValue;
+            }
+        }
+    }
+
+    // Goal = 0110, 01010, 010010
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 4; j++) {
+            if (star[i][j] == EMPTY && star[i][j + 3] == EMPTY)
+                if (star[i][j + 1] == star[i][j + 2] &&
+                    star[i][j + 2] == who)
+                    heuristic += twoValue;
+        }
+    }
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 5; j++) {
+            if (star[i][j] == EMPTY && star[i][j + 2] == EMPTY && star[i][j + 4] == EMPTY)
+                if (star[i][j + 1] == star[i][j + 3] &&
+                    star[i][j + 3] == who)
+                    heuristic += twoValue;
+        }
+    }
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j <= SIZE - 6; j++) {
+            if (star[i][j] == EMPTY && star[i][j + 2] == EMPTY && star[i][j + 3] == EMPTY && star[i][j + 5] == EMPTY)
+                if (star[i][j + 1] == star[i][j + 4] &&
+                    star[i][j + 4] == who)
+                    heuristic += twoValue;
+        }
+    }
+
+    return heuristic;
 }
 
 //---------------------------------------------------------------------------------------------------------------//
