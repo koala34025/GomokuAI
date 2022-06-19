@@ -18,6 +18,7 @@ enum SPOT_STATE {
 const int oneValue = 2; 
 const int twoValue = 100;
 const int deathThreeValue = 100;
+const int oneSpotThreeValue = 800;
 const int threeValue = 1000;
 const int deathFourValue = 10000;
 const int fourValue = 100000;
@@ -575,7 +576,12 @@ int ThreeCount(int who) {
         }
     }
 
-    // Goal = 011010
+    return cnt;
+}
+
+int OneSpotThreeCount(int who) {
+    // Goal = 011010, since only mid spot is worth choosing, down scale its scoring
+    int cnt = 0;
     int opponent = get_next_player(who);
 
     // Check horizontally
@@ -704,6 +710,16 @@ int DeathThreeCount(int who) {
                 ok = false;
             }
             if (ok) {
+                if (board[i][j] == EMPTY) {
+                    if (j >= 1 && board[i][j - 1] == who) {
+                        continue;
+                    }
+                }
+                if (board[i][j + 4] == EMPTY) {
+                    if (j < SIZE - 5 && board[i][j + 5] == who) {
+                        continue;
+                    }
+                }
                 cnt++;
             }
         }
@@ -726,6 +742,16 @@ int DeathThreeCount(int who) {
                 ok = false;
             }
             if (ok) {
+                if (board[i][j] == EMPTY) {
+                    if (i >= 1 && board[i - 1][j] == who) {
+                        continue;
+                    }
+                }
+                if (board[i + 4][j] == EMPTY) {
+                    if (i < SIZE - 5 && board[i + 5][j] == who) {
+                        continue;
+                    }
+                }
                 cnt++;
             }
         }
@@ -748,6 +774,16 @@ int DeathThreeCount(int who) {
                 ok = false;
             }
             if (ok) {
+                if (board[i][j] == EMPTY) {
+                    if (i >= 1 && j >= 1 && board[i - 1][j - 1] == who) {
+                        continue;
+                    }
+                }
+                if (board[i + 4][j + 4] == EMPTY) {
+                    if (i < SIZE - 5 && j < SIZE - 5 && board[i + 5][j + 5] == who) {
+                        continue;
+                    }
+                }
                 cnt++;
             }
         }
@@ -770,6 +806,16 @@ int DeathThreeCount(int who) {
                 ok = false;
             }
             if (ok) {
+                if (board[i][j] == EMPTY) {
+                    if (i < SIZE - 1 && j >= 1 && board[i + 1][j - 1] == who) {
+                        continue;
+                    }
+                }
+                if (board[i + 4][j + 4] == EMPTY) {
+                    if (i > 4 && j < SIZE - 5 && board[i - 5][j + 5] == who) {
+                        continue;
+                    }
+                }
                 cnt++;
             }
         }
@@ -1228,6 +1274,11 @@ int OverallScore(int who) {
     if (DEBUG && tmpCnt > 0)
         std::cout << ", DeathThreeCount: " << tmpCnt;
 
+    tmpCnt = OneSpotThreeCount(who);
+    score += tmpCnt * oneSpotThreeValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", OneSpotThreeCount: " << tmpCnt;
+
     tmpCnt = ThreeCount(who);
     score += tmpCnt * threeValue;
     if (DEBUG && tmpCnt > 0)
@@ -1310,12 +1361,24 @@ void OrderMoves(std::list<Point>& places, int who) {
     for (Point& p : places) {
         int heuristic = 0;
 
-        std::array<std::array<int, 9>, 4> star = { 0 };
+        std::array<std::array<int, 9>, 4> star;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 9; j++) {
+                star[i][j] = -1;
+            }
+        }
         for (int i = -4; i <= 4; i++) {
-            star[0][i + 4] = board[p.x + i][p.y];
-            star[1][i + 4] = board[p.x + i][p.y + i];
-            star[2][i + 4] = board[p.x][p.y + i];
-            star[3][i + 4] = board[p.x - i][p.y + i];
+            if (is_spot_on_board(Point(p.x + i, p.y)))
+                star[0][i + 4] = board[p.x + i][p.y];
+
+            if (is_spot_on_board(Point(p.x + i, p.y + i)))
+                star[1][i + 4] = board[p.x + i][p.y + i];
+
+            if (is_spot_on_board(Point(p.x, p.y + i)))
+                star[2][i + 4] = board[p.x][p.y + i];
+
+            if (is_spot_on_board(Point(p.x - i, p.y + i)))
+                star[3][i + 4] = board[p.x - i][p.y + i];
         }
         
         // 11111
