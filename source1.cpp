@@ -8,6 +8,7 @@
 #include <utility>
 #define DEBUG 0
 #define MXDEPTH 3
+#define GENDIST 2 
 
 enum SPOT_STATE {
     EMPTY = 0,
@@ -135,7 +136,7 @@ std::list<Point> GeneratePlaces() {
             if (!is_spot_valid(Point(i, j)))
                 continue;
             
-            if (HasNeighborInValidSpot(Point(i, j), 2, 0))
+            if (HasNeighborInValidSpot(Point(i, j), GENDIST, 0))
                 places.push_back(Point(i, j));
         }
     }
@@ -1268,15 +1269,15 @@ int OverallScore(int who) {
     if (DEBUG)
         std::cout << "For " << ((who == 1) ? "O" : "X");
 
-    //tmpCnt = OneCount(who);
-    //score += tmpCnt * oneValue;
-    //if (DEBUG && tmpCnt > 0)
-    //    std::cout << ", OneCount: " << tmpCnt;
+    tmpCnt = OneCount(who);
+    score += tmpCnt * oneValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", OneCount: " << tmpCnt;
 
-    //tmpCnt = TwoCount(who);
-    //score += tmpCnt * twoValue;
-    //if (DEBUG && tmpCnt > 0)
-    //    std::cout << ", TwoCount: " << tmpCnt;
+    tmpCnt = TwoCount(who);
+    score += tmpCnt * twoValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", TwoCount: " << tmpCnt;
 
     tmpCnt = DeathThreeCount(who);
     score += tmpCnt * deathThreeValue;
@@ -1369,6 +1370,7 @@ void OrderMoves(std::list<Point>& places, int who) {
     int opponent = get_next_player(who);
 
     for (Point& p : places) {
+        set_disc(p, who);
         int heuristic = 0;
 
         std::array<std::array<int, 9>, 4> star;
@@ -1390,7 +1392,7 @@ void OrderMoves(std::list<Point>& places, int who) {
             if (is_spot_on_board(Point(p.x - i, p.y + i)))
                 star[3][i + 4] = board[p.x - i][p.y + i];
         }
-        
+           
         // 11111
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 5; j++) {
@@ -1560,7 +1562,7 @@ void OrderMoves(std::list<Point>& places, int who) {
         }
 
         // Goal = 0110, 01010, 010010
-        /*for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
                 if (star[i][j] == EMPTY && star[i][j + 3] == EMPTY)
                     if (star[i][j + 1] == star[i][j + 2] &&
@@ -1583,9 +1585,10 @@ void OrderMoves(std::list<Point>& places, int who) {
                         star[i][j + 4] == who)
                         heuristic += twoValue;
             }
-        }*/
+        }
         
         p.h = heuristic;
+        set_disc(p, EMPTY);
     }
     places.sort(PointGreater());
 }
@@ -1602,6 +1605,10 @@ std::pair<int, Point> MiniMax(int depth, int alpha, int beta, int maximizingPlay
 
     std::list<Point> places = GeneratePlaces();
     OrderMoves(places, who);
+    
+    if (places.empty()) {
+        return { 0, Point(7, 7) };
+    }
 
     if (maximizingPlayer) {
         int maxEval = -INF;
