@@ -6,8 +6,8 @@
 #include <list>
 #include <map>
 #include <utility>
-#define DEBUG 1
-#define MXDEPTH 1
+#define DEBUG 0
+#define MXDEPTH 3
 
 enum SPOT_STATE {
     EMPTY = 0,
@@ -49,8 +49,17 @@ struct Point {
     Point operator-(const Point& rhs) const {
         return Point(x - rhs.x, y - rhs.y);
     }
-    bool operator<(const Point& rhs) const {
-        return h > rhs.h;
+};
+
+struct PointGreater {
+    bool operator()(const Point& lhs, const Point& rhs) {
+        return lhs.h > rhs.h;
+    }
+};
+
+struct PointLesser {
+    bool operator()(const Point& lhs, const Point& rhs) {
+        return lhs.h < rhs.h;
     }
 };
 
@@ -1259,15 +1268,15 @@ int OverallScore(int who) {
     if (DEBUG)
         std::cout << "For " << ((who == 1) ? "O" : "X");
 
-    tmpCnt = OneCount(who);
-    score += tmpCnt * oneValue;
-    if (DEBUG && tmpCnt > 0)
-        std::cout << ", OneCount: " << tmpCnt;
+    //tmpCnt = OneCount(who);
+    //score += tmpCnt * oneValue;
+    //if (DEBUG && tmpCnt > 0)
+    //    std::cout << ", OneCount: " << tmpCnt;
 
-    tmpCnt = TwoCount(who);
-    score += tmpCnt * twoValue;
-    if (DEBUG && tmpCnt > 0)
-        std::cout << ", TwoCount: " << tmpCnt;
+    //tmpCnt = TwoCount(who);
+    //score += tmpCnt * twoValue;
+    //if (DEBUG && tmpCnt > 0)
+    //    std::cout << ", TwoCount: " << tmpCnt;
 
     tmpCnt = DeathThreeCount(who);
     score += tmpCnt * deathThreeValue;
@@ -1305,9 +1314,9 @@ int OverallScore(int who) {
     return score;
 }
 
-int Evaluate(int who) {
-    int myScore = OverallScore(who);
-    int opponentScore = OverallScore(get_next_player(who));
+int Evaluate() {
+    int myScore = OverallScore(player);
+    int opponentScore = OverallScore(get_next_player(player));
 
     int evaluation = myScore - opponentScore;
 
@@ -1325,7 +1334,7 @@ std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
     tried++;
 
     if (depth == 0) {
-        return { Evaluate(who), Point(-1, -1) };
+        return { Evaluate(), Point(-1, -1) };
     }
 
     std::list<Point> places = GeneratePlaces();
@@ -1358,6 +1367,7 @@ std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
 
 void OrderMoves(std::list<Point>& places, int who) {
     int opponent = get_next_player(who);
+
     for (Point& p : places) {
         int heuristic = 0;
 
@@ -1550,7 +1560,7 @@ void OrderMoves(std::list<Point>& places, int who) {
         }
 
         // Goal = 0110, 01010, 010010
-        for (int i = 0; i < 4; i++) {
+        /*for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
                 if (star[i][j] == EMPTY && star[i][j + 3] == EMPTY)
                     if (star[i][j + 1] == star[i][j + 2] &&
@@ -1573,11 +1583,62 @@ void OrderMoves(std::list<Point>& places, int who) {
                         star[i][j + 4] == who)
                         heuristic += twoValue;
             }
-        }
+        }*/
         
         p.h = heuristic;
     }
-    places.sort();
+    places.sort(PointGreater());
+}
+
+//---------------------------------------------------------------------------------------------------------------//
+
+std::pair<int, Point> MiniMax(int depth, int alpha, int beta, int maximizingPlayer) {
+    tried++;
+    int who = (maximizingPlayer == true ? player : get_next_player(player));
+
+    if (depth == 0) {
+        return { Evaluate(), Point(-1, -1) };
+    }
+
+    std::list<Point> places = GeneratePlaces();
+    OrderMoves(places, who);
+
+    if (maximizingPlayer) {
+        int maxEval = -INF;
+        Point PlacePoint;
+        for (Point p : places) {
+            set_disc(p, who);
+            int evaluation = MiniMax(depth-1, alpha, beta, false).first;
+            set_disc(p, EMPTY);
+            //maxEval = max(maxEval, evaluation);
+            if (evaluation > maxEval) {
+                maxEval = evaluation;
+                PlacePoint = p;
+            }
+            alpha = std::max(alpha, evaluation);
+            if (beta <= alpha)
+                break;
+        }
+        return { maxEval, PlacePoint };
+    }
+    else {
+        int minEval = INF;
+        Point PlacePoint;
+        for (Point p : places) {
+            set_disc(p, who);
+            int evaluation = MiniMax(depth - 1, alpha, beta, true).first;
+            set_disc(p, EMPTY);
+            //minEval = min(minEval, evaluation);
+            if (evaluation < minEval) {
+                minEval = evaluation;
+                PlacePoint = p;
+            }
+            beta = std::min(beta, evaluation);
+            if (beta <= alpha)
+                break;
+        }
+        return { minEval, PlacePoint };
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------------//
@@ -1597,9 +1658,10 @@ void write_valid_spot(std::ofstream& fout) {
 
     Point PlacePoint;
     
-    PlacePoint = AlphaBeta(MXDEPTH, -INF, INF, player).second;
+    //PlacePoint = AlphaBeta(MXDEPTH, -INF, INF, player).second;
+    PlacePoint = MiniMax(MXDEPTH, -INF, INF, true).second;
 
-    if (DEBUG)
+    //if (DEBUG)
         std::cout << "Tried: " << tried << '\n';
 
     fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
