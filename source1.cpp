@@ -18,7 +18,7 @@ enum SPOT_STATE {
 const int oneValue = 2; 
 const int twoValue = 100;
 const int deathThreeValue = 100;
-const int oneSpotThreeValue = 800;
+const int oneSpotThreeValue = 1000;
 const int threeValue = 1000;
 const int deathFourValue = 10000;
 const int fourValue = 100000;
