@@ -16,11 +16,12 @@ enum SPOT_STATE {
     WHITE = 2
 };
 
-const int oneValue = 2;
-const int twoValue = 100;
-const int deathThreeValue = 100;
+const int oneValue = 1;
+const int twoValue = 50;
+const int deathThreeValue = 50;
 const int oneSpotThreeValue = 1000;
-const int threeValue = 1000;
+const int threeValue = 5000;
+const int breakDeathFourValue = 10000;
 const int deathFourValue = 10000;
 const int fourValue = 100000;
 const int fiveValue = 10000000;
@@ -161,6 +162,7 @@ int FiveCount(int who) {
                 }
             }
             if (ok) {
+                return 1;
                 cnt++;
             }
         }
@@ -177,6 +179,7 @@ int FiveCount(int who) {
                 }
             }
             if (ok) {
+                return 1;
                 cnt++;
             }
         }
@@ -193,6 +196,7 @@ int FiveCount(int who) {
                 }
             }
             if (ok) {
+                return 1;
                 cnt++;
             }
         }
@@ -209,6 +213,7 @@ int FiveCount(int who) {
                 }
             }
             if (ok) {
+                return 1;
                 cnt++;
             }
         }
@@ -232,6 +237,7 @@ int FourCount(int who) {
                 }
             }
             if (ok) {
+                return 1;
                 cnt++;
             }
         }
@@ -248,6 +254,7 @@ int FourCount(int who) {
                 }
             }
             if (ok) {
+                return 1;
                 cnt++;
             }
         }
@@ -264,6 +271,7 @@ int FourCount(int who) {
                 }
             }
             if (ok) {
+                return 1;
                 cnt++;
             }
         }
@@ -280,6 +288,7 @@ int FourCount(int who) {
                 }
             }
             if (ok) {
+                return 1;
                 cnt++;
             }
         }
@@ -381,6 +390,13 @@ int DeathFourCount(int who) {
             }
         }
     }
+
+    return cnt;
+}
+
+int BreakDeathFourCount(int who) {
+    int opponent = get_next_player(who);
+    int cnt = 0;
 
     // Goal = 0111010, 2111010, 0111012 - 0111100 etc.
     // Check horizontally
@@ -1269,45 +1285,56 @@ int OverallScore(int who) {
     if (DEBUG)
         std::cout << "For " << ((who == 1) ? "O" : "X");
 
-    tmpCnt = OneCount(who);
-    score += tmpCnt * oneValue;
+    tmpCnt = FiveCount(who);
+    score += tmpCnt * fiveValue;
     if (DEBUG && tmpCnt > 0)
-        std::cout << ", OneCount: " << tmpCnt;
-
-    tmpCnt = TwoCount(who);
-    score += tmpCnt * twoValue;
-    if (DEBUG && tmpCnt > 0)
-        std::cout << ", TwoCount: " << tmpCnt;
-
-    tmpCnt = DeathThreeCount(who);
-    score += tmpCnt * deathThreeValue;
-    if (DEBUG && tmpCnt > 0)
-        std::cout << ", DeathThreeCount: " << tmpCnt;
-
-    tmpCnt = OneSpotThreeCount(who);
-    score += tmpCnt * oneSpotThreeValue;
-    if (DEBUG && tmpCnt > 0)
-        std::cout << ", OneSpotThreeCount: " << tmpCnt;
-
-    tmpCnt = ThreeCount(who);
-    score += tmpCnt * threeValue;
-    if (DEBUG && tmpCnt > 0)
-        std::cout << ", ThreeCount: " << tmpCnt;
-
-    tmpCnt = DeathFourCount(who);
-    score += tmpCnt * deathFourValue;
-    if (DEBUG && tmpCnt > 0)
-        std::cout << ", DeathFourCount: " << tmpCnt;
+        std::cout << ", FiveCount: " << tmpCnt;
+    
+    if (score >= fiveValue)
+        return score;
 
     tmpCnt = FourCount(who);
     score += tmpCnt * fourValue;
     if (DEBUG && tmpCnt > 0)
         std::cout << ", FourCount: " << tmpCnt;
 
-    tmpCnt = FiveCount(who);
-    score += tmpCnt * fiveValue;
+    if (score >= fourValue)
+        return score;
+
+    tmpCnt = DeathFourCount(who);
+    score += tmpCnt * deathFourValue;
     if (DEBUG && tmpCnt > 0)
-        std::cout << ", FiveCount: " << tmpCnt;
+        std::cout << ", DeathFourCount: " << tmpCnt;
+
+    tmpCnt = BreakDeathFourCount(who);
+    score += tmpCnt * breakDeathFourValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", BreakDeathFourCount: " << tmpCnt;
+
+    tmpCnt = ThreeCount(who);
+    score += tmpCnt * threeValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", ThreeCount: " << tmpCnt;
+
+    tmpCnt = OneSpotThreeCount(who);
+    score += tmpCnt * oneSpotThreeValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", OneSpotThreeCount: " << tmpCnt;
+
+    tmpCnt = DeathThreeCount(who);
+    score += tmpCnt * deathThreeValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", DeathThreeCount: " << tmpCnt;
+
+    tmpCnt = TwoCount(who);
+    score += tmpCnt * twoValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", TwoCount: " << tmpCnt;
+
+    tmpCnt = OneCount(who);
+    score += tmpCnt * oneValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", OneCount: " << tmpCnt;
 
     if (DEBUG)
         std::cout << "\n";
@@ -1597,10 +1624,11 @@ void OrderMoves(std::list<Point>& places, int who) {
 
 std::pair<int, Point> MiniMax(int depth, int alpha, int beta, int maximizingPlayer) {
     tried++;
+
     int who = (maximizingPlayer == true ? player : get_next_player(player));
 
     if (depth == 0) {
-        return { Evaluate(), Point(-1, -1) };
+        return { Evaluate(), Point(0, 0) };
     }
 
     std::list<Point> places = GeneratePlaces();
@@ -1663,10 +1691,12 @@ void write_valid_spot(std::ofstream& fout) {
     srand(time(NULL));
     // Keep updating the output until getting killed.
 
-    Point PlacePoint;
 
     //PlacePoint = AlphaBeta(MXDEPTH, -INF, INF, player).second;
-    PlacePoint = MiniMax(MXDEPTH, -INF, INF, true).second;
+    std::pair<int, Point> result = MiniMax(MXDEPTH, -INF, INF, true);
+
+    Point PlacePoint = result.second;
+    std::cout << result.first << '\n';
 
     //if (DEBUG)
     std::cout << "Tried: " << tried << '\n';
