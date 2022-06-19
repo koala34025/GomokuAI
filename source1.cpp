@@ -23,6 +23,7 @@ const int deathFourValue = 10000;
 const int fourValue = 100000;
 const int fiveValue = 10000000;
 
+long long int tried = 0;
 int player;
 const int SIZE = 15;
 std::array<std::array<int, SIZE>, SIZE> board;
@@ -497,6 +498,12 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
+                if (j >= 1 && board[i][j - 1] == who) {
+                    continue;
+                }
+                if (j < SIZE - 5 && board[i][j + 5] == who) {
+                    continue;
+                }
                 cnt++;
             }
         }
@@ -513,6 +520,12 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
+                if (i >= 1 && board[i - 1][j] == who) {
+                    continue;
+                }
+                if (i < SIZE - 5 && board[i + 5][j] == who) {
+                    continue;
+                }
                 cnt++;
             }
         }
@@ -529,6 +542,12 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
+                if (i >= 1 && j >= 1 && board[i - 1][j - 1] == who) {
+                    continue;
+                }
+                if (i < SIZE - 5 && j < SIZE - 5 && board[i + 5][j + 5] == who) {
+                    continue;
+                }
                 cnt++;
             }
         }
@@ -545,6 +564,12 @@ int ThreeCount(int who) {
                 }
             }
             if (ok) {
+                if (i < SIZE - 1 && j >= 1  && board[i + 1][j - 1] == who) {
+                    continue;
+                }
+                if (i >= 5 && j < SIZE - 5 && board[i - 5][j + 5] == who) {
+                    continue;
+                }
                 cnt++;
             }
         }
@@ -863,11 +888,8 @@ int DeathThreeCount(int who) {
             if ((board[i][j] == EMPTY && board[i][j + 6] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i][j + 6] == opponent) ||
                 (board[i][j] == opponent && board[i][j + 6] == EMPTY)) {
-                if ((board[i][j + 1] & board[i][j + 2] & board[i][j + 3]) ||
-                    (board[i][j + 4] & board[i][j + 2] & board[i][j + 3]) ||
-                    (board[i][j + 4] & board[i][j + 5] & board[i][j + 3])) {
+                if (board[i][j + 1] != who || board[i][j + 5] != who)
                     continue;
-                }
                 for (int k = 0; k < 5; k++) {
                     if (board[i][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -891,11 +913,8 @@ int DeathThreeCount(int who) {
             if ((board[i][j] == EMPTY && board[i + 6][j] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i + 6][j] == opponent) ||
                 (board[i][j] == opponent && board[i + 6][j] == EMPTY)) {
-                if ((board[i + 1][j] & board[i + 2][j] & board[i + 3][j]) ||
-                    (board[i + 4][j] & board[i + 2][j] & board[i + 3][j]) ||
-                    (board[i + 4][j] & board[i + 5][j] & board[i + 3][j])) {
+                if (board[i + 1][j] != who || board[i + 5][j] != who)
                     continue;
-                }
                 for (int k = 0; k < 5; k++) {
                     if (board[i + 1 + k][j] == opponent) {
                         myDotCnt = 0;
@@ -919,11 +938,8 @@ int DeathThreeCount(int who) {
             if ((board[i][j] == EMPTY && board[i + 6][j + 6] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i + 6][j + 6] == opponent) ||
                 (board[i][j] == opponent && board[i + 6][j + 6] == EMPTY)) {
-                if ((board[i + 1][j + 1] & board[i + 2][j + 2] & board[i + 3][j + 3]) ||
-                    (board[i + 4][j + 4] & board[i + 2][j + 2] & board[i + 3][j + 3]) ||
-                    (board[i + 4][j + 4] & board[i + 5][j + 5] & board[i + 3][j + 3])) {
+                if (board[i + 1][j + 1] != who || board[i + 5][j + 5] != who)
                     continue;
-                }
                 for (int k = 0; k < 5; k++) {
                     if (board[i + 1 + k][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -947,11 +963,8 @@ int DeathThreeCount(int who) {
             if ((board[i][j] == EMPTY && board[i - 6][j + 6] == EMPTY) ||
                 (board[i][j] == EMPTY && board[i - 6][j + 6] == opponent) ||
                 (board[i][j] == opponent && board[i - 6][j + 6] == EMPTY)) {
-                if ((board[i - 1][j + 1] & board[i - 2][j + 2] & board[i - 3][j + 3]) ||
-                    (board[i - 4][j + 4] & board[i - 2][j + 2] & board[i - 3][j + 3]) ||
-                    (board[i - 4][j + 4] & board[i - 5][j + 5] & board[i - 3][j + 3])) {
+                if (board[i - 1][j + 1] != who || board[i - 5][j + 5] != who)
                     continue;
-                }
                 for (int k = 0; k < 5; k++) {
                     if (board[i - 1 - k][j + 1 + k] == opponent) {
                         myDotCnt = 0;
@@ -1258,6 +1271,8 @@ int Evaluate(int who) {
 //---------------------------------------------------------------------------------------------------------------//
 
 std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
+    tried++;
+
     if (depth == 0) {
         return { Evaluate(who), Point(-1, -1) };
     }
@@ -1520,6 +1535,9 @@ void write_valid_spot(std::ofstream& fout) {
     Point PlacePoint;
     
     PlacePoint = AlphaBeta(MXDEPTH, -INF, INF, player).second;
+
+    if (DEBUG)
+        std::cout << "Tried: " << tried << '\n';
 
     fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
     // Remember to flush the output to ensure the last action is written to file.
