@@ -148,6 +148,7 @@ std::list<Point> GeneratePlaces() {
 //---------------------------------------------------------------------------------------------------------------//
 
 int FiveCount(int who) {
+    // High score return 1 when found
     int goal[] = { who, who, who, who, who };
     int cnt = 0;
 
@@ -163,6 +164,7 @@ int FiveCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -179,6 +181,7 @@ int FiveCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -195,6 +198,7 @@ int FiveCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -211,6 +215,7 @@ int FiveCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -219,6 +224,7 @@ int FiveCount(int who) {
 }
 
 int FourCount(int who) {
+    // High score return 1 when found
     int goal[] = { EMPTY, who, who, who, who, EMPTY };
     int cnt = 0;
 
@@ -234,6 +240,7 @@ int FourCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -250,6 +257,7 @@ int FourCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -266,6 +274,7 @@ int FourCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -282,6 +291,7 @@ int FourCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -290,6 +300,7 @@ int FourCount(int who) {
 }
 
 int DeathFourCount(int who) {
+    // High score return 1 when found
     // Goal = 211110, 011112;
     int goal[] = { who, who, who, who };
     int opponent = get_next_player(who);
@@ -313,6 +324,7 @@ int DeathFourCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -335,6 +347,7 @@ int DeathFourCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -357,6 +370,7 @@ int DeathFourCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -379,6 +393,7 @@ int DeathFourCount(int who) {
             }
             if (ok) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -407,6 +422,7 @@ int DeathFourCount(int who) {
             }
             if (myDotCnt == 4) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -434,6 +450,7 @@ int DeathFourCount(int who) {
             }
             if (myDotCnt == 4) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -461,6 +478,7 @@ int DeathFourCount(int who) {
             }
             if (myDotCnt == 4) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -488,6 +506,7 @@ int DeathFourCount(int who) {
             }
             if (myDotCnt == 4) {
                 cnt++;
+                return 1;
             }
         }
     }
@@ -496,6 +515,7 @@ int DeathFourCount(int who) {
 }
 
 int ThreeCount(int who) {
+    const int MX3COUNT = 2;
     int goal[] = { EMPTY, who, who, who, EMPTY };
     int cnt = 0;
 
@@ -521,6 +541,9 @@ int ThreeCount(int who) {
         }
     }
 
+    if (cnt >= MX3COUNT)
+        return MX3COUNT;
+
     // Check vertically
     for (int i = 0; i <= SIZE - 5; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -542,6 +565,9 @@ int ThreeCount(int who) {
             }
         }
     }
+
+    if (cnt >= MX3COUNT)
+        return MX3COUNT;
 
     // Check diagonally "\"
     for (int i = 0; i <= SIZE - 5; i++) {
@@ -565,6 +591,9 @@ int ThreeCount(int who) {
         }
     }
 
+    if (cnt >= MX3COUNT)
+        return MX3COUNT;
+
     // Check diagonally "/"
     for (int i = 4; i < SIZE; i++) {
         for (int j = 0; j <= SIZE - 5; j++) {
@@ -587,10 +616,14 @@ int ThreeCount(int who) {
         }
     }
 
+    if (cnt >= MX3COUNT)
+        return MX3COUNT;
+
     return cnt;
 }
 
 int OneSpotThreeCount(int who) {
+    const int MX1SPOT3COUNT = 2;
     // Goal = 011010, since only mid spot is worth choosing, down scale its scoring
     int cnt = 0;
     int opponent = get_next_player(who);
@@ -620,6 +653,9 @@ int OneSpotThreeCount(int who) {
         }
     }
 
+    if (cnt >= MX1SPOT3COUNT)
+        return MX1SPOT3COUNT;
+
     // Check vertically
     for (int i = 0; i <= SIZE - 6; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -644,6 +680,9 @@ int OneSpotThreeCount(int who) {
             }
         }
     }
+
+    if (cnt >= MX1SPOT3COUNT)
+        return MX1SPOT3COUNT;
 
     // Check diagonally "\"
     for (int i = 0; i <= SIZE - 6; i++) {
@@ -670,6 +709,9 @@ int OneSpotThreeCount(int who) {
         }
     }
 
+    if (cnt >= MX1SPOT3COUNT)
+        return MX1SPOT3COUNT;
+
     // Check diagonally "/"
     for (int i = 5; i < SIZE; i++) {
         for (int j = 0; j <= SIZE - 6; j++) {
@@ -695,10 +737,14 @@ int OneSpotThreeCount(int who) {
         }
     }
 
+    if (cnt >= MX1SPOT3COUNT)
+        return MX1SPOT3COUNT;
+
     return cnt;
 }
 
 int DeathThreeCount(int who) {
+    const int MXDEATH3COUNT = 3;
     // Goal = 21110, 01112;
     int goal[] = { who, who, who };
     int opponent = get_next_player(who);
@@ -736,6 +782,9 @@ int DeathThreeCount(int who) {
         }
     }
 
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
+
     // Check vertically
     for (int i = 0; i <= SIZE - 5; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -767,6 +816,9 @@ int DeathThreeCount(int who) {
             }
         }
     }
+
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
 
     // Check diagonally "\"
     for (int i = 0; i <= SIZE - 5; i++) {
@@ -800,6 +852,9 @@ int DeathThreeCount(int who) {
         }
     }
 
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
+
     // Check diagonally "/"
     for (int i = 4; i < SIZE; i++) {
         for (int j = 0; j <= SIZE - 5; j++) {
@@ -832,6 +887,9 @@ int DeathThreeCount(int who) {
         }
     }
 
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
+
     // Goal = 211010, 011012 - 011010
     // Check horizontally
     for (int i = 0; i < SIZE; i++) {
@@ -859,6 +917,9 @@ int DeathThreeCount(int who) {
         }
     }
 
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
+
     // Check vertically
     for (int i = 0; i <= SIZE - 6; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -884,6 +945,9 @@ int DeathThreeCount(int who) {
             }
         }
     }
+
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
 
     // Check diagonally "\"
     for (int i = 0; i <= SIZE - 6; i++) {
@@ -911,6 +975,9 @@ int DeathThreeCount(int who) {
         }
     }
 
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
+
     // Check diagonally "/"
     for (int i = 5; i < SIZE; i++) {
         for (int j = 0; j <= SIZE - 6; j++) {
@@ -936,6 +1003,9 @@ int DeathThreeCount(int who) {
             }
         }
     }
+
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
 
     // Goal = 0110010, 2110010, 0110012
     // Check horizontally
@@ -963,6 +1033,9 @@ int DeathThreeCount(int who) {
         }
     }
 
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
+
     // Check vertically
     for (int i = 0; i <= SIZE - 7; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -987,6 +1060,9 @@ int DeathThreeCount(int who) {
             }
         }
     }
+
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
 
     // Check diagonally "\"
     for (int i = 0; i <= SIZE - 7; i++) {
@@ -1013,6 +1089,9 @@ int DeathThreeCount(int who) {
         }
     }
 
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
+
     // Check diagonally "/"
     for (int i = 6; i < SIZE; i++) {
         for (int j = 0; j <= SIZE - 7; j++) {
@@ -1037,6 +1116,9 @@ int DeathThreeCount(int who) {
             }
         }
     }
+
+    if (cnt >= MXDEATH3COUNT)
+        return MXDEATH3COUNT;
 
     return cnt;
 }
@@ -1270,45 +1352,54 @@ int OverallScore(int who) {
     if (DEBUG)
         std::cout << "For " << ((who == 1) ? "O" : "X");
 
-    tmpCnt = OneCount(who);
-    score += tmpCnt * oneValue;
-    if (DEBUG && tmpCnt > 0)
-        std::cout << ", OneCount: " << tmpCnt;
+    tmpCnt = FiveCount(who);
+    score += tmpCnt * fiveValue;
+    if (score >= fiveValue)
+        return score;
 
-    tmpCnt = TwoCount(who);
-    score += tmpCnt * twoValue;
     if (DEBUG && tmpCnt > 0)
-        std::cout << ", TwoCount: " << tmpCnt;
+        std::cout << ", FiveCount: " << tmpCnt;
 
-    tmpCnt = DeathThreeCount(who);
-    score += tmpCnt * deathThreeValue;
-    if (DEBUG && tmpCnt > 0)
-        std::cout << ", DeathThreeCount: " << tmpCnt;
+    tmpCnt = FourCount(who);
+    score += tmpCnt * fourValue;
+    if (score >= fourValue)
+        return score;
 
-    tmpCnt = OneSpotThreeCount(who);
-    score += tmpCnt * oneSpotThreeValue;
     if (DEBUG && tmpCnt > 0)
-        std::cout << ", OneSpotThreeCount: " << tmpCnt;
+        std::cout << ", FourCount: " << tmpCnt;
+
+    tmpCnt = DeathFourCount(who);
+    score += tmpCnt * deathFourValue;
+    if (score >= deathFourValue)
+        return score;
+
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", DeathFourCount: " << tmpCnt;
 
     tmpCnt = ThreeCount(who);
     score += tmpCnt * threeValue;
     if (DEBUG && tmpCnt > 0)
         std::cout << ", ThreeCount: " << tmpCnt;
 
-    tmpCnt = DeathFourCount(who);
-    score += tmpCnt * deathFourValue;
+    tmpCnt = OneSpotThreeCount(who);
+    score += tmpCnt * oneSpotThreeValue;
     if (DEBUG && tmpCnt > 0)
-        std::cout << ", DeathFourCount: " << tmpCnt;
+        std::cout << ", OneSpotThreeCount: " << tmpCnt;
 
-    tmpCnt = FourCount(who);
-    score += tmpCnt * fourValue;
+    tmpCnt = DeathThreeCount(who);
+    score += tmpCnt * deathThreeValue;
     if (DEBUG && tmpCnt > 0)
-        std::cout << ", FourCount: " << tmpCnt;
+        std::cout << ", DeathThreeCount: " << tmpCnt;
 
-    tmpCnt = FiveCount(who);
-    score += tmpCnt * fiveValue;
+    tmpCnt = TwoCount(who);
+    score += tmpCnt * twoValue;
     if (DEBUG && tmpCnt > 0)
-        std::cout << ", FiveCount: " << tmpCnt;
+        std::cout << ", TwoCount: " << tmpCnt;
+
+    tmpCnt = OneCount(who);
+    score += tmpCnt * oneValue;
+    if (DEBUG && tmpCnt > 0)
+        std::cout << ", OneCount: " << tmpCnt;
 
     if (DEBUG)
         std::cout << "\n";
@@ -1369,10 +1460,9 @@ std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
 
 void OrderMoves(std::list<Point>& places, int who) {
     for (Point& p : places) {
-        int oldHeuristic = GetHeuristic(p, who);
         set_disc(p, who);
         int newHeuristic = GetHeuristic(p, who);
-        p.h = newHeuristic - oldHeuristic;
+        p.h = newHeuristic;
         set_disc(p, EMPTY);
     }
     places.sort(PointGreater());
