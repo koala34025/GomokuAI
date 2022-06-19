@@ -1696,10 +1696,10 @@ void write_valid_spot(std::ofstream& fout) {
     std::pair<int, Point> result = MiniMax(MXDEPTH, -INF, INF, true);
 
     Point PlacePoint = result.second;
-    std::cout << result.first << '\n';
+    //std::cout << result.first << '\n';
 
     //if (DEBUG)
-    std::cout << "Tried: " << tried << '\n';
+    //std::cout << "Tried: " << tried << '\n';
 
     fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
     // Remember to flush the output to ensure the last action is written to file.
