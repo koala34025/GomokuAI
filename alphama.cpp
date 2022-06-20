@@ -1289,6 +1289,8 @@ int OverallScore(int who) {
     if (DEBUG)
         std::cout << "For " << ((who == 1) ? "O" : "X");
 
+    // Process during MiniMax();
+    /*
     tmpCnt = FiveCount(who);
     score += tmpCnt * fiveValue;
     if (DEBUG && tmpCnt > 0)
@@ -1296,6 +1298,7 @@ int OverallScore(int who) {
 
     if (score >= fiveValue)
         return score;
+    */
 
     tmpCnt = FourCount(who);
     score += tmpCnt * fourValue;
@@ -1346,7 +1349,7 @@ int OverallScore(int who) {
     return score;
 }
 
-int Evaluate(int who) {
+int Evaluate(int who, bool maximizingPlayer) {
     int myScore = OverallScore(who);
     int opponentScore = OverallScore(get_next_player(who));
 
@@ -1355,6 +1358,31 @@ int Evaluate(int who) {
     // Fix starting
     if (opponentScore > 0) {
         evaluation++;
+    }
+
+    if (!maximizingPlayer) {
+        // No need to check zero step win
+        // Check one step win
+        if (opponentScore >= fourValue) {
+            evaluation -= fourValue;
+        }
+        else if (opponentScore >= deathFourValue) {
+            evaluation -= fourValue;
+        }
+        // Check more steps win
+        // idk
+    }
+    else {
+        // No need to check zero step win
+        // Check one step win
+        if (myScore >= fourValue) {
+            evaluation += fourValue;
+        }
+        else if (myScore >= deathFourValue) {
+            evaluation += fourValue;
+        }
+        // Check more steps win
+        // idk
     }
 
     return evaluation;
@@ -1626,13 +1654,13 @@ void OrderMoves(std::list<Point>& places, int who) {
 
 //---------------------------------------------------------------------------------------------------------------//
 
-int MiniMax(int depth, int alpha, int beta, int maximizingPlayer) {
+int MiniMax(int depth, int alpha, int beta, bool maximizingPlayer) {
     tried++;
 
     int who = (maximizingPlayer == true ? player : get_next_player(player));
 
     if (depth == 0) {
-        return Evaluate(player);
+        return Evaluate(player,  maximizingPlayer);
     }
 
     std::list<Point> places = GeneratePlaces();
