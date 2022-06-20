@@ -8,8 +8,8 @@
 #include <utility>
 #define DEBUG 0
 #define SAFEDEPTH 2
-#define MXDEPTH 3
-#define GENDIST 2 
+#define MXDEPTH 5
+#define GENDIST 2
 
 struct Point {
     int x, y;
@@ -1293,7 +1293,7 @@ int OverallScore(int who) {
     score += tmpCnt * fiveValue;
     if (DEBUG && tmpCnt > 0)
         std::cout << ", FiveCount: " << tmpCnt;
-    
+
     if (score >= fiveValue)
         return score;
 
@@ -1366,7 +1366,7 @@ std::pair<int, Point> AlphaBeta(int depth, int alpha, int beta, int who) {
     tried++;
 
     if (depth == 0) {
-        return { Evaluate(who), Point(-1, -1) };
+        return { 0, Point(-1, -1) };
     }
 
     std::list<Point> places = GeneratePlaces();
@@ -1648,7 +1648,21 @@ int MiniMax(int depth, int alpha, int beta, int maximizingPlayer) {
         Point place;
         for (Point p : places) {
             set_disc(p, who);
-            int evaluation = MiniMax(depth - 1, alpha, beta, false);
+            int evaluation;
+
+            int myResult = FiveCount(player);
+            if (myResult > 0){
+                evaluation = INF*2;
+//                set_disc(p, EMPTY);
+//                if(depth == NOWDEPTH){
+//                    PlacePoint = p;
+//                }
+//                return INF*2;
+            }
+            else{
+                evaluation = MiniMax(depth - 1, alpha, beta, false);
+            }
+
             set_disc(p, EMPTY);
             //maxEval = max(maxEval, evaluation);
             if (evaluation > maxEval) {
@@ -1669,7 +1683,21 @@ int MiniMax(int depth, int alpha, int beta, int maximizingPlayer) {
         Point place;
         for (Point p : places) {
             set_disc(p, who);
-            int evaluation = MiniMax(depth - 1, alpha, beta, true);
+            int evaluation;
+
+            int myResult = FiveCount(get_next_player(player));
+            if (myResult > 0){
+                evaluation = -INF*2;
+//                set_disc(p, EMPTY);
+//                if(depth == NOWDEPTH){
+//                    PlacePoint = p;
+//                }
+//                return -INF*2;
+            }
+            else{
+                evaluation = MiniMax(depth - 1, alpha, beta, true);
+            }
+
             set_disc(p, EMPTY);
             //minEval = min(minEval, evaluation);
             if (evaluation < minEval) {
@@ -1703,7 +1731,8 @@ void write_valid_spot(std::ofstream& fout) {
     // Keep updating the output until getting killed.
 
     for (NOWDEPTH = SAFEDEPTH;NOWDEPTH <= MXDEPTH; NOWDEPTH++) {
-        MiniMax(NOWDEPTH, -INF, INF, true);
+        int result = MiniMax(NOWDEPTH, -INF, INF, true);
+        std::cout << "Result: " << result << ", " << "Tried: " << tried << "\n" ;
 
         fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
         fout.flush();
