@@ -7,7 +7,8 @@
 #include <map>
 #include <utility>
 #define DEBUG 0
-#define MXDEPTH 3
+#define SAFEDEPTH 2
+#define MXDEPTH 5
 #define GENDIST 2 
 
 enum SPOT_STATE {
@@ -1691,19 +1692,19 @@ void write_valid_spot(std::ofstream& fout) {
     srand(time(NULL));
     // Keep updating the output until getting killed.
 
+    for (int i = SAFEDEPTH;i <= MXDEPTH; i++) {
+        std::pair<int, Point> result = MiniMax(i, -INF, INF, true);
 
-    //PlacePoint = AlphaBeta(MXDEPTH, -INF, INF, player).second;
-    std::pair<int, Point> result = MiniMax(MXDEPTH, -INF, INF, true);
+        Point PlacePoint = result.second;
 
-    Point PlacePoint = result.second;
+        fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
+        fout.flush();
+        std::cout << "Depth: " << i << ", (" << PlacePoint.x << " " << PlacePoint.y << ")\n";
+    }
     //std::cout << result.first << '\n';
 
     //if (DEBUG)
     //std::cout << "Tried: " << tried << '\n';
-
-    fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
-    // Remember to flush the output to ensure the last action is written to file.
-    fout.flush();
 }
 
 int main(int, char** argv) {
