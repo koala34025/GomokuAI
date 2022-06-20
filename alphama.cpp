@@ -8,7 +8,7 @@
 #include <utility>
 #define DEBUG 0
 #define SAFEDEPTH 2
-#define MXDEPTH 5
+#define MXDEPTH 4
 #define GENDIST 2
 
 struct Point {
@@ -1645,14 +1645,14 @@ int MiniMax(int depth, int alpha, int beta, int maximizingPlayer) {
 
     if (maximizingPlayer) {
         int maxEval = -INF;
-        Point place;
+        Point place(-1, -1);
         for (Point p : places) {
             set_disc(p, who);
             int evaluation;
 
             int myResult = FiveCount(player);
             if (myResult > 0){
-                evaluation = INF*2;
+                evaluation = fiveValue + depth;
 //                set_disc(p, EMPTY);
 //                if(depth == NOWDEPTH){
 //                    PlacePoint = p;
@@ -1680,14 +1680,14 @@ int MiniMax(int depth, int alpha, int beta, int maximizingPlayer) {
     }
     else {
         int minEval = INF;
-        Point place;
+        Point place(-1, -1);
         for (Point p : places) {
             set_disc(p, who);
             int evaluation;
 
             int myResult = FiveCount(get_next_player(player));
             if (myResult > 0){
-                evaluation = -INF*2;
+                evaluation = -fiveValue - depth;
 //                set_disc(p, EMPTY);
 //                if(depth == NOWDEPTH){
 //                    PlacePoint = p;
@@ -1733,9 +1733,15 @@ void write_valid_spot(std::ofstream& fout) {
     for (NOWDEPTH = SAFEDEPTH;NOWDEPTH <= MXDEPTH; NOWDEPTH++) {
         int result = MiniMax(NOWDEPTH, -INF, INF, true);
         std::cout << "Result: " << result << ", " << "Tried: " << tried << "\n" ;
+        
+        if (PlacePoint.x == -1 && PlacePoint.y == -1) {
+            std::cout << "No fout!\n";
+        }
+        else {
+            fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
+            fout.flush();
+        }
 
-        fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
-        fout.flush();
         std::cout << "Depth: " << NOWDEPTH << ", (" << PlacePoint.x << " " << PlacePoint.y << ")\n";
     }
     //std::cout << result.first << '\n';
