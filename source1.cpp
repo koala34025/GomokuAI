@@ -11,6 +11,28 @@
 #define MXDEPTH 5
 #define GENDIST 2 
 
+struct Point {
+    int x, y;
+    int h;
+    Point() : Point(0, 0) {}
+    Point(float x, float y) : x(x), y(y) {}
+    bool operator==(const Point& rhs) const {
+        return x == rhs.x && y == rhs.y;
+    }
+    bool operator!=(const Point& rhs) const {
+        return !operator==(rhs);
+    }
+    Point operator+(const Point& rhs) const {
+        return Point(x + rhs.x, y + rhs.y);
+    }
+    Point operator-(const Point& rhs) const {
+        return Point(x - rhs.x, y - rhs.y);
+    }
+};
+
+int NOWDEPTH;
+Point PlacePoint;
+
 enum SPOT_STATE {
     EMPTY = 0,
     BLACK = 1,
@@ -34,25 +56,6 @@ std::array<std::array<int, SIZE>, SIZE> board;
 int d8x[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
 int d8y[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
 const int INF = 1e9;
-
-struct Point {
-    int x, y;
-    int h;
-    Point() : Point(0, 0) {}
-    Point(float x, float y) : x(x), y(y) {}
-    bool operator==(const Point& rhs) const {
-        return x == rhs.x && y == rhs.y;
-    }
-    bool operator!=(const Point& rhs) const {
-        return !operator==(rhs);
-    }
-    Point operator+(const Point& rhs) const {
-        return Point(x + rhs.x, y + rhs.y);
-    }
-    Point operator-(const Point& rhs) const {
-        return Point(x - rhs.x, y - rhs.y);
-    }
-};
 
 struct PointGreater {
     bool operator()(const Point& lhs, const Point& rhs) {
@@ -1623,57 +1626,64 @@ void OrderMoves(std::list<Point>& places, int who) {
 
 //---------------------------------------------------------------------------------------------------------------//
 
-std::pair<int, Point> MiniMax(int depth, int alpha, int beta, int maximizingPlayer) {
+int MiniMax(int depth, int alpha, int beta, int maximizingPlayer) {
     tried++;
 
     int who = (maximizingPlayer == true ? player : get_next_player(player));
 
     if (depth == 0) {
-        return { Evaluate(), Point(0, 0) };
+        return Evaluate();
     }
 
     std::list<Point> places = GeneratePlaces();
     OrderMoves(places, who);
 
     if (places.empty()) {
-        return { 0, Point(7, 7) };
+        PlacePoint = Point(7, 7);
+        return 0;
     }
 
     if (maximizingPlayer) {
         int maxEval = -INF;
-        Point PlacePoint;
+        Point place;
         for (Point p : places) {
             set_disc(p, who);
-            int evaluation = MiniMax(depth - 1, alpha, beta, false).first;
+            int evaluation = MiniMax(depth - 1, alpha, beta, false);
             set_disc(p, EMPTY);
             //maxEval = max(maxEval, evaluation);
             if (evaluation > maxEval) {
                 maxEval = evaluation;
-                PlacePoint = p;
+                place = p;
             }
             alpha = std::max(alpha, evaluation);
             if (beta <= alpha)
                 break;
         }
-        return { maxEval, PlacePoint };
+        if (depth == NOWDEPTH) {
+            PlacePoint = place;
+        }
+        return maxEval;
     }
     else {
         int minEval = INF;
-        Point PlacePoint;
+        Point place;
         for (Point p : places) {
             set_disc(p, who);
-            int evaluation = MiniMax(depth - 1, alpha, beta, true).first;
+            int evaluation = MiniMax(depth - 1, alpha, beta, true);
             set_disc(p, EMPTY);
             //minEval = min(minEval, evaluation);
             if (evaluation < minEval) {
                 minEval = evaluation;
-                PlacePoint = p;
+                place = p;
             }
             beta = std::min(beta, evaluation);
             if (beta <= alpha)
                 break;
         }
-        return { minEval, PlacePoint };
+        if (depth == NOWDEPTH) {
+            PlacePoint = place;
+        }
+        return minEval;
     }
 }
 
@@ -1692,14 +1702,12 @@ void write_valid_spot(std::ofstream& fout) {
     srand(time(NULL));
     // Keep updating the output until getting killed.
 
-    for (int i = SAFEDEPTH;i <= MXDEPTH; i++) {
-        std::pair<int, Point> result = MiniMax(i, -INF, INF, true);
-
-        Point PlacePoint = result.second;
+    for (NOWDEPTH = SAFEDEPTH;NOWDEPTH <= MXDEPTH; NOWDEPTH++) {
+        MiniMax(NOWDEPTH, -INF, INF, true);
 
         fout << PlacePoint.x << " " << PlacePoint.y << std::endl;
         fout.flush();
-        std::cout << "Depth: " << i << ", (" << PlacePoint.x << " " << PlacePoint.y << ")\n";
+        std::cout << "Depth: " << NOWDEPTH << ", (" << PlacePoint.x << " " << PlacePoint.y << ")\n";
     }
     //std::cout << result.first << '\n';
 
