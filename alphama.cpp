@@ -6,6 +6,8 @@
 #include <list>
 #include <map>
 #include <utility>
+#include <algorithm>
+
 #define DEBUG 0
 #define SAFEDEPTH 2
 #define MXDEPTH 4
@@ -1067,68 +1069,96 @@ int TwoCount(int who) {
     int goal_3[] = { EMPTY, who, EMPTY, EMPTY, who, EMPTY };
     int cnt = 0;
 
+    // Prevent goal1 incoming double three
+    std::list<Point> twoHeads;
     // Goal 1
     // Check horizontally
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j <= SIZE - 4; j++) {
-            bool ok = true;
-            for (int k = 0; k < 4; k++) {
-                if (board[i][j + k] != goal_1[k]) {
-                    ok = false;
-                    break;
-                }
-            }
-            if (ok) {
-                cnt++;
-            }
-        }
-    }
-
     // Check vertically
-    for (int i = 0; i <= SIZE - 4; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            bool ok = true;
-            for (int k = 0; k < 4; k++) {
-                if (board[i + k][j] != goal_1[k]) {
-                    ok = false;
-                    break;
-                }
-            }
-            if (ok) {
-                cnt++;
-            }
-        }
-    }
-
     // Check diagonally "\"
-    for (int i = 0; i <= SIZE - 4; i++) {
-        for (int j = 0; j <= SIZE - 4; j++) {
-            bool ok = true;
-            for (int k = 0; k < 4; k++) {
-                if (board[i + k][j + k] != goal_1[k]) {
-                    ok = false;
-                    break;
-                }
-            }
-            if (ok) {
-                cnt++;
-            }
-        }
-    }
-
     // Check diagonally "/"
-    for (int i = 3; i < SIZE; i++) {
-        for (int j = 0; j <= SIZE - 4; j++) {
-            bool ok = true;
-            for (int k = 0; k < 4; k++) {
-                if (board[i - k][j + k] != goal_1[k]) {
-                    ok = false;
-                    break;
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (j <= SIZE - 4) {
+                bool ok = true;
+                for (int k = 0; k < 4; k++) {
+                    if (board[i][j + k] != goal_1[k]) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok) {
+                    cnt++;
+                    Point head1(i, j);
+                    Point head2(i, j + 3);
+                    if (find(twoHeads.begin(), twoHeads.end(), head1) != twoHeads.end() ||
+                        find(twoHeads.begin(), twoHeads.end(), head2) != twoHeads.end()) {
+                        cnt += 20;
+                    }
+                    twoHeads.push_back(head1);
+                    twoHeads.push_back(head2);
                 }
             }
-            if (ok) {
-                cnt++;
+            if (i <= SIZE - 4) {
+                bool ok = true;
+                for (int k = 0; k < 4; k++) {
+                    if (board[i + k][j] != goal_1[k]) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok) {
+                    cnt++;
+                    Point head1(i, j);
+                    Point head2(i + 3, j);
+                    if (find(twoHeads.begin(), twoHeads.end(), head1) != twoHeads.end() ||
+                        find(twoHeads.begin(), twoHeads.end(), head2) != twoHeads.end()) {
+                        cnt += 20;
+                    }
+                    twoHeads.push_back(head1);
+                    twoHeads.push_back(head2);
+                }
             }
+            if (i <= SIZE - 4 && j <= SIZE - 4) {
+                bool ok = true;
+                for (int k = 0; k < 4; k++) {
+                    if (board[i + k][j + k] != goal_1[k]) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok) {
+                    cnt++;
+                    Point head1(i, j);
+                    Point head2(i + 3, j + 3);
+                    if (find(twoHeads.begin(), twoHeads.end(), head1) != twoHeads.end() ||
+                        find(twoHeads.begin(), twoHeads.end(), head2) != twoHeads.end()) {
+                        cnt += 20;
+                    }
+                    twoHeads.push_back(head1);
+                    twoHeads.push_back(head2);
+                }
+            }
+            if (i >= 3 && j <= SIZE - 4) {
+                bool ok = true;
+                for (int k = 0; k < 4; k++) {
+                    if (board[i - k][j + k] != goal_1[k]) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok) {
+                    cnt++;
+                    Point head1(i, j);
+                    Point head2(i - 3, j + 3);
+                    if (find(twoHeads.begin(), twoHeads.end(), head1) != twoHeads.end() ||
+                        find(twoHeads.begin(), twoHeads.end(), head2) != twoHeads.end()) {
+                        cnt += 20;
+                    }
+                    twoHeads.push_back(head1);
+                    twoHeads.push_back(head2);
+                }
+            }
+            
         }
     }
 
@@ -1371,6 +1401,11 @@ int Evaluate(int who, bool maximizingPlayer) {
         }
         // Check more steps win
         // idk
+        else if (opponentScore >= threeValue) {
+            if (myScore <= deathFourValue) {
+                evaluation -= fourValue;
+            }
+        }
     }
     else {
         // No need to check zero step win
@@ -1383,6 +1418,11 @@ int Evaluate(int who, bool maximizingPlayer) {
         }
         // Check more steps win
         // idk
+        else if (myScore >= threeValue) {
+            if (opponentScore <= deathFourValue) {
+                evaluation += fourValue;
+            }
+        }
     }
 
     return evaluation;
