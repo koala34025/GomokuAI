@@ -1394,10 +1394,10 @@ int Evaluate(int who, bool maximizingPlayer) {
         // No need to check zero step win
         // Check one step win
         if (opponentScore >= fourValue) {
-            evaluation -= fourValue;
+            evaluation -= fiveValue;
         }
         else if (opponentScore >= deathFourValue) {
-            evaluation -= fourValue;
+            evaluation -= fiveValue;
         }
         // Check more steps win
         // idk
@@ -1411,10 +1411,10 @@ int Evaluate(int who, bool maximizingPlayer) {
         // No need to check zero step win
         // Check one step win
         if (myScore >= fourValue) {
-            evaluation += fourValue;
+            evaluation += fiveValue;
         }
         else if (myScore >= deathFourValue) {
-            evaluation += fourValue;
+            evaluation += fiveValue;
         }
         // Check more steps win
         // idk
